@@ -119,9 +119,38 @@ def _render_approval_page(success_message: str = None, done: bool = False):
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
+def _load_latest_pulse_if_headless():
+    """Load the latest generated pulse note if running disconnected from main.py."""
+    state = app.config["PULSE_STATE"]
+    if not state["pulse_note"] and not state["themes"]:
+        # Try to load from outputs/latest_pulse.json (Git-Sync architecture)
+        json_path = PROJECT_ROOT / "outputs" / "latest_pulse.json"
+        if json_path.exists():
+            try:
+                import json
+                with open(json_path, "r") as f:
+                    data = json.load(f)
+                state["pulse_note"] = data.get("pulse_note", "")
+                state["themes"] = data.get("themes", [])
+                state["action_ideas"] = data.get("action_ideas", [])
+                state["review_count"] = data.get("review_count", 0)
+            except Exception as e:
+                logger.error(f"Failed to load latest_pulse.json: {e}")
+
+        # Try to re-initialize config for HF Spaces if missing
+        if state["config"] is None:
+            try:
+                from phase1_scaffold.config import load_config
+                from phase1_scaffold.main import create_llm_router
+                state["config"] = load_config()
+                state["router"] = create_llm_router(state["config"])
+            except Exception as e:
+                logger.error(f"Failed to auto-initialize Config/Router: {e}")
+
 @app.route("/")
 def index():
     """Render pulse note preview + fee explainer input."""
+    _load_latest_pulse_if_headless()
     return _render_approval_page()
 
 

@@ -19,6 +19,7 @@ module imports in later phases.
 
 import sys
 import os
+import json
 from datetime import datetime
 
 # Add project root to sys.path to allow imports from sub-packages
@@ -233,6 +234,25 @@ def run_pipeline():
                 "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
             }
         ]
+
+    # Save to JSON for the Hugging Face deployed UI
+    latest_data = {
+        "pulse_note": pulse_note or "(No pulse note generated)",
+        "themes": themes_for_ui,
+        "action_ideas": theme_result.action_ideas if theme_result else [],
+        "review_count": len(clean_reviews),
+        "generated_at": datetime.now().isoformat()
+    }
+    
+    os.makedirs(config.outputs_dir, exist_ok=True)
+    with open(config.outputs_dir / "latest_pulse.json", "w") as f:
+        json.dump(latest_data, f, indent=2)
+    print("  ✅ Data saved to outputs/latest_pulse.json")
+
+    # Skip UI launch if running in a GitHub Action Cron
+    if os.environ.get("RUN_HEADLESS_PIPELINE_ONLY") == "true":
+        print("  ⚠️  Headless mode detected. Exiting before Approval UI.")
+        return
 
     decision = launch_approval_ui(
         config=config,
