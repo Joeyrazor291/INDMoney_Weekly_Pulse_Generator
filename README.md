@@ -1,3 +1,12 @@
+---
+title: INDMoney Pulse UI
+emoji: 🏦
+colorFrom: blue
+colorTo: purple
+sdk: docker
+pinned: false
+---
+
 # 🏦 INDMoney Weekly App Review Pulse
 
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
