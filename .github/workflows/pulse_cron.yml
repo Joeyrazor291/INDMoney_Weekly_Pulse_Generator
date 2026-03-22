@@ -1,0 +1,46 @@
+name: INDMoney Weekly Pulse Cron
+
+on:
+  schedule:
+    # Runs at 09:00 AM IST (03:30 AM UTC) every Friday
+    - cron: '30 3 * * 5'
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+
+jobs:
+  run-pulse-generator:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r phase1_scaffold/requirements.txt
+        
+    - name: Run Phase 1 Orchestrator (Pulse Pipeline)
+      env:
+        # ⚠️ Make sure to add these to your GitHub Repository Secrets!
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        APP_ID: com.indmoney.indstocks
+        REVIEW_COUNT: 1000
+        WEEKS_BACK: 8
+        # Use this flag so your main script generates the files and safely exits, rather than launching the Flask UI.
+        RUN_HEADLESS_PIPELINE_ONLY: "true"
+      run: |
+        python phase1_scaffold/main.py
+        
+    - name: Commit & Push Pulse Data (Trigger HF Space Sync)
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add data/ outputs/
+        git commit -m "chore: Automate Weekly Pulse Data [skip ci]" || echo "No changes to commit"
+        git push

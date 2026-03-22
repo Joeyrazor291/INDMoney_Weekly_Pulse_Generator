@@ -1,0 +1,42 @@
+# ═══════════════════════════════════════════════════════════
+#  INDMoney Pulse Generator — .gitignore
+# ═══════════════════════════════════════════════════════════
+
+# ── Secrets ──────────────────────────────────────────────
+.env
+google_credentials.json
+
+# ── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environment ─────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── IDE ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ── Generated Output (keep directory, ignore contents) ──
+outputs/drafts/*.eml
+outputs/notes_log.json
+data/raw/*.json
+data/raw/*.csv
+
+# ── Testing ──────────────────────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+
+# ── Local Documentation ──────────────────────────────────
+UI screens/

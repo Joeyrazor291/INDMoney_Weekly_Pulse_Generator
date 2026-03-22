@@ -1,0 +1,18 @@
+## 🏦 INDMoney — Weekly App Review Pulse
+**Week of:** {{ week_date }}  |  **Reviews analysed:** {{ review_count }}
+
+---
+
+### 🔍 Top Themes This Week
+{% for t in top_themes %}
+**{{ loop.index }}. {{ t.theme }}** — {{ t.summary }}
+> _"{{ t.quote }}"_
+{% endfor %}
+
+### 🚀 Action Ideas
+{% for a in actions %}
+{{ loop.index }}. {{ a }}
+{% endfor %}
+
+---
+*Generated {{ generated_at }} · No PII included*
