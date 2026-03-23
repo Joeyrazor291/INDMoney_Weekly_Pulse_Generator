@@ -176,6 +176,20 @@ def generate_fee():
 
     config = state["config"]
     router = state["router"]
+    
+    if router is None:
+        logger.error("Fee explanation failed: LLM router is not initialized.")
+        state["fee_explanation"] = {
+            "scenario": scenario,
+            "bullets": [
+                "Error: AI generation is currently disabled.",
+                "Missing API Keys: Hugging Face Spaces does not have access to your local .env file. Please copy your GROQ_API_KEY from your .env and add it to the 'Settings > Variables and secrets' section of your Hugging Face Space."
+            ],
+            "source_links": [],
+            "last_checked": "",
+        }
+        return redirect(url_for("index"))
+
     try:
         explanation = generate_fee_explanation(router, scenario)
         state["fee_explanation"] = explanation
