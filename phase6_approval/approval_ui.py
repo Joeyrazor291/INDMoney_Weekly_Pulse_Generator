@@ -29,6 +29,14 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
+# ── Flask App ────────────────────────────────────────────────────────────────
+
+app = Flask(
+    __name__,
+    template_folder=str(Path(__file__).parent / "templates"),
+    static_folder=str(Path(__file__).parent / "static"),
+)
+
 # ── Error Handler ────────────────────────────────────────────────────────────
 
 @app.errorhandler(Exception)
@@ -37,14 +45,6 @@ def handle_exception(e):
     logger.error(f"Unhandled Exception: {e}")
     tb = traceback.format_exc()
     return f"<h1>500 Internal Server Error</h1><pre>{tb}</pre>", 500
-
-# ── Flask App ────────────────────────────────────────────────────────────────
-
-app = Flask(
-    __name__,
-    template_folder=str(Path(__file__).parent / "templates"),
-    static_folder=str(Path(__file__).parent / "static"),
-)
 
 # Initialization of app state
 app.config["PULSE_STATE"] = {
@@ -326,4 +326,4 @@ def launch_approval_ui(config, router, pulse_note: str, themes: list,
     # Block until a decision is made
     _shutdown_event.wait()
 
-    return _state["decision"] or "skip"
+    return state["decision"] or "skip"
