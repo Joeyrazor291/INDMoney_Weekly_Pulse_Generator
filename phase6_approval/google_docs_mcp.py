@@ -83,8 +83,16 @@ async def append_to_doc(document_id: str, content: str) -> str:
         return f"Successfully appended {len(content)} characters to Doc {document_id}"
         
     except Exception as e:
-        logger.error(f"Error appending to Google Doc: {e}")
-        return f"Error: {str(e)}"
+        import googleapiclient.errors
+        error_msg = str(e)
+        if isinstance(e, googleapiclient.errors.HttpError):
+            if e.resp.status == 404:
+                error_msg = f"Document not found ({document_id}). Please check your GOOGLE_DOC_ID secret for typos (e.g., 'I' vs 'l')."
+            elif e.resp.status == 403:
+                error_msg = f"Permission denied for Doc {document_id}. Please share the document with: pulse-generator@indmoney-pulse.iam.gserviceaccount.com"
+        
+        logger.error(f"Error appending to Google Doc: {error_msg}")
+        return f"Error: {error_msg}"
 
 if __name__ == "__main__":
     # Run the server using the fastmcp runner

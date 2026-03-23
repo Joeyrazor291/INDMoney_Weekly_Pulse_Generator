@@ -75,7 +75,13 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
                 return result
 
     try:
-        asyncio.run(_run_mcp())
+        result = asyncio.run(_run_mcp())
+        # The result is a CallToolResult. Check content for error messages.
+        if hasattr(result, "content") and result.content:
+            for item in result.content:
+                if hasattr(item, "text") and item.text.startswith("Error:"):
+                    raise RuntimeError(item.text)
+        
         logger.info(f"Appended notes to Google Doc ID: {google_doc_id}")
     except Exception as e:
         logger.error(f"Failed to append to Google Doc via MCP: {e}")
