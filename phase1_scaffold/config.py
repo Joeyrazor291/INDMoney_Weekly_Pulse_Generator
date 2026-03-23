@@ -83,7 +83,7 @@ class Config:
     )
     mcp_args: list[str] = field(
         default_factory=lambda: os.getenv(
-            "MCP_ARGS", "phase6_approval/google_docs_mcp.py"
+            "MCP_ARGS", "phase6_approval/google_docs_mcp_v2.py"
         ).split(",")
     )
 

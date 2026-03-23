@@ -62,7 +62,7 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
     if command == "python":
         command = sys.executable
         
-    args = mcp_args or ["phase6_approval/google_docs_mcp.py"]
+    args = mcp_args or ["phase6_approval/google_docs_mcp_v2.py"]
 
     async def _run_mcp():
         server_params = StdioServerParameters(
@@ -74,7 +74,7 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
             async with ClientSession(read, write) as session:
                 await session.initialize()
                 # Call the downstream tool exposed by the local MCP server
-                # Uses internal google_docs_mcp.py tool 'append_to_doc'
+                # Uses internal google_docs_mcp_v2.py tool 'append_to_doc'
                 result = await session.call_tool("append_to_doc", arguments={
                     "document_id": google_doc_id,
                     "content": content

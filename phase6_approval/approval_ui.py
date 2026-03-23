@@ -232,6 +232,10 @@ def debug_config():
     if not config:
         return "Not initialized", 404
         
+    fee_expl = state.get("fee_explanation") or {}
+    fee_bullets = fee_expl.get("bullets", [])
+    fee_err = fee_bullets[0] if (fee_bullets and isinstance(fee_bullets[0], str) and "Error" in fee_bullets[0]) else None
+    
     return {
         "google_doc_id": config.google_doc_id,
         "mcp_command": config.mcp_command,
@@ -241,7 +245,7 @@ def debug_config():
         "google_creds_preview": (config.google_docs_credentials[:30] + "...") if config.google_docs_credentials else "missing",
         "last_mcp_error": LAST_MCP_ERROR,
         "fee_explanation_present": bool(state.get("fee_explanation")),
-        "fee_explanation_error": state.get("fee_explanation", {}).get("bullets", [""])[0] if state.get("fee_explanation", {}).get("bullets") and "Error" in state.get("fee_explanation", {}).get("bullets")[0] else None,
+        "fee_explanation_error": fee_err,
         "status": "active"
     }
 
