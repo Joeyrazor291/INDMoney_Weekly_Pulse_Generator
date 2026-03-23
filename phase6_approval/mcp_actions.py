@@ -19,6 +19,9 @@ from mcp.client.stdio import stdio_client
 
 import imaplib
 import time
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 logger = logging.getLogger(__name__)
 
@@ -85,16 +88,12 @@ def create_email_draft(pulse_note: str, email_to: str,
                        gmail_user: str, gmail_app_password: str,
                        fee_explanation: dict | None = None) -> str:
     """
-    Create a real email draft in the user's Gmail Drafts folder via IMAP.
+    Create a real email draft in the user's Gmail Drafts folder via API or IMAP.
 
     Returns a success message with the subject.
     """
-    if not gmail_user or not gmail_app_password:
-        raise ValueError("GMAIL_USER or GMAIL_APP_PASSWORD is not set. Cannot create draft.")
-
     today = datetime.now().strftime("%Y-%m-%d")
     subject = f"Weekly Pulse — INDMoney — {today}"
-
     body = pulse_note or ""
 
     if fee_explanation:
@@ -107,13 +106,45 @@ def create_email_draft(pulse_note: str, email_to: str,
             body += f"- {link}\n"
         body += f"\n*Last checked: {fee_explanation.get('last_checked', today)}*\n"
 
-    # Build MIME message
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = subject
-    msg["To"] = email_to
-    msg["From"] = gmail_user
-    # X-Unsent is required by many email clients to treat this as a draft
-    msg["X-Unsent"] = "1"
+    # Try OAuth2 / Gmail API first (HTTPS)
+    refresh_token = os.getenv("GMAIL_REFRESH_TOKEN")
+    client_id = os.getenv("GMAIL_CLIENT_ID")
+    client_secret = os.getenv("GMAIL_CLIENT_SECRET")
+
+    if refresh_token and client_id and client_secret:
+        try:
+            creds = Credentials(
+                None,
+                refresh_token=refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=client_id,
+                client_secret=client_secret,
+                scopes=["https://www.googleapis.com/auth/gmail.compose"]
+            )
+            service = build("gmail", "v1", credentials=creds)
+            
+            # Create the message
+            import base64
+            from email.message import EmailMessage
+            
+            email_msg = EmailMessage()
+            email_msg.set_content(body)
+            email_msg["To"] = email_to
+            email_msg["From"] = gmail_user
+            email_msg["Subject"] = subject
+            
+            encoded_message = base64.urlsafe_b64encode(email_msg.as_bytes()).decode()
+            create_message = {"message": {"raw": encoded_message}}
+            
+            draft = service.users().drafts().create(userId="me", body=create_message).execute()
+            logger.info(f"Gmail draft created via API: {draft['id']}")
+            return subject
+        except Exception as e:
+            logger.error(f"Gmail API failed, falling back to IMAP if possible. Error: {e}")
+
+    # Fallback to IMAP (original logic)
+    if not gmail_user or not gmail_app_password:
+        raise ValueError("Neither GMAIL_REFRESH_TOKEN nor GMAIL_APP_PASSWORD is set. Cannot create draft.")
 
     try:
         # Connect to Gmail IMAP
@@ -121,14 +152,19 @@ def create_email_draft(pulse_note: str, email_to: str,
         mail.login(gmail_user, gmail_app_password)
         
         # Append to the drafts folder
-        # Note: In Gmail, the drafts folder is usually "[Gmail]/Drafts"
         draft_folder = '"[Gmail]/Drafts"'
         internal_date = imaplib.Time2Internaldate(time.time())
         
-        # Append message
+        # Build MIME message (re-build for IMAP compatibility)
+        msg = MIMEText(body, "plain", "utf-8")
+        msg["Subject"] = subject
+        msg["To"] = email_to
+        msg["From"] = gmail_user
+        msg["X-Unsent"] = "1"
+
         status, response = mail.append(
             draft_folder,
-            '',  # Flags (empty string means default)
+            '',  # Flags
             internal_date,
             msg.as_bytes()
         )
@@ -141,6 +177,6 @@ def create_email_draft(pulse_note: str, email_to: str,
         return subject
         
     except imaplib.IMAP4.error as e:
-        logger.error(f"IMAP authentication failed. Ensure App Password is correct. Error: {e}")
-        raise RuntimeError(f"Failed to authenticate with Gmail via IMAP: {e}")
+        logger.error(f"IMAP authentication failed. Error: {e}")
+        raise RuntimeError(f"Failed to authenticate with Gmail: {e}")
 
