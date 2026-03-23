@@ -122,23 +122,22 @@ def _render_approval_page(success_message: str = None, done: bool = False):
 
 @app.before_request
 def _ensure_state_initialized():
-    """Ensure the latest pulse and config are loaded before every request (crucial for HF Spaces)."""
+    """Ensure the latest pulse and config are loaded (crucial for HF Spaces)."""
     state = app.config["PULSE_STATE"]
     
-    # Load latest_pulse.json if pulse_note is empty (Git-Sync architecture)
-    if not state["pulse_note"] and not state["themes"]:
-        json_path = PROJECT_ROOT / "outputs" / "latest_pulse.json"
-        if json_path.exists():
-            try:
-                import json
-                with open(json_path, "r") as f:
-                    data = json.load(f)
-                state["pulse_note"] = data.get("pulse_note", "")
-                state["themes"] = data.get("themes", [])
-                state["action_ideas"] = data.get("action_ideas", [])
-                state["review_count"] = data.get("review_count", 0)
-            except Exception as e:
-                logger.error(f"Failed to load latest_pulse.json: {e}")
+    # ALWAYS check for fresh data from outputs/latest_pulse.json (Git-Sync architecture)
+    json_path = PROJECT_ROOT / "outputs" / "latest_pulse.json"
+    if json_path.exists():
+        try:
+            import json
+            with open(json_path, "r") as f:
+                data = json.load(f)
+            state["pulse_note"] = data.get("pulse_note", "")
+            state["themes"] = data.get("themes", [])
+            state["action_ideas"] = data.get("action_ideas", [])
+            state["review_count"] = data.get("review_count", 0)
+        except Exception as e:
+            logger.error(f"Failed to load latest_pulse.json: {e}")
 
     # Re-initialize config/router for production if missing
     if state["router"] is None:
