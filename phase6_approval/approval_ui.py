@@ -27,6 +27,9 @@ from phase6_approval.mcp_actions import append_to_notes, create_email_draft
 from phase8_analytics.history_manager import get_analytics_history
 import traceback
 
+# For production debugging
+LAST_EXCEPTION = None
+
 logger = logging.getLogger(__name__)
 
 # ── Flask App ────────────────────────────────────────────────────────────────
@@ -227,27 +230,41 @@ def generate_fee():
 def debug_config():
     """Return non-sensitive config for debugging production mismatches."""
     from .mcp_actions import LAST_MCP_ERROR
-    state = app.config.get("PULSE_STATE", {})
+    state = app.config.get("PULSE_STATE")
+    if state is None:
+        return jsonify({"status": "uninitialized", "error": "PULSE_STATE not found in app config"}), 200
+        
     config = state.get("config")
     if not config:
-        return "Not initialized", 404
+        return jsonify({"status": "no_config", "error": "Config object not in state"}), 200
         
     fee_expl = state.get("fee_explanation") or {}
     fee_bullets = fee_expl.get("bullets", [])
     fee_err = fee_bullets[0] if (fee_bullets and isinstance(fee_bullets[0], str) and "Error" in fee_bullets[0]) else None
     
-    return {
+    # Secret Health Checks
+    def check_creds(val):
+        if not val: return "❌ MISSING"
+        if val.strip().startswith("{"): return "✅ VALID JSON"
+        if "/" in val or "." in val: return f"⚠️ PATH? ({val[:15]}...)"
+        if len(val) > 20 and val.isalnum(): return "❌ ERROR (Looks like a Doc ID or Key, not JSON)"
+        return f"❓ UNKNOWN ({val[:10]}...)"
+
+    return jsonify({
         "google_doc_id": config.google_doc_id,
         "mcp_command": config.mcp_command,
         "mcp_args": config.mcp_args,
         "gmail_user": config.gmail_user,
-        "openrouter_key_present": bool(config.openrouter_api_key),
-        "google_creds_preview": (config.google_docs_credentials[:30] + "...") if config.google_docs_credentials else "missing",
+        "health_checks": {
+            "OPENROUTER_API_KEY": "✅ SET" if config.openrouter_api_key else "❌ MISSING",
+            "GOOGLE_DOCS_CREDENTIALS": check_creds(config.google_docs_credentials),
+            "GMAIL_REFRESH_TOKEN": "✅ SET" if os.getenv("GMAIL_REFRESH_TOKEN") else "❌ MISSING"
+        },
         "last_mcp_error": LAST_MCP_ERROR,
-        "fee_explanation_present": bool(state.get("fee_explanation")),
+        "last_app_exception": LAST_EXCEPTION,
         "fee_explanation_error": fee_err,
         "status": "active"
-    }
+    })
 
 @app.route("/approve/notes", methods=["POST"])
 def approve_notes():
