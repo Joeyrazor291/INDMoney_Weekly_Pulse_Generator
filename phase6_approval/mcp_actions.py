@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 
 def append_to_notes(google_doc_id: str, pulse_note: str,
                     themes: list, review_count: int,
+                    mcp_command: str = "python",
+                    mcp_args: list[str] = None,
                     fee_explanation: dict | None = None) -> str:
     """
     Append the weekly pulse to a Google Document via the MCP Server.
@@ -50,13 +52,11 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
         content += f"\n*Last checked: {fee_explanation.get('last_checked', '')}*\n"
 
     import sys
-    command = os.getenv("MCP_COMMAND", "npx")
+    command = mcp_command or "python"
     if command == "python":
         command = sys.executable
         
-    # Parse comma separated args from env if multiple are needed
-    args_str = os.getenv("MCP_ARGS", "-y,@modelcontextprotocol/server-everything")
-    args = args_str.split(",")
+    args = mcp_args or ["phase6_approval/google_docs_mcp.py"]
 
     async def _run_mcp():
         server_params = StdioServerParameters(command=command, args=args)

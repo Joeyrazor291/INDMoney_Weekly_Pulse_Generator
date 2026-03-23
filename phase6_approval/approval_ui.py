@@ -233,6 +233,8 @@ def approve_notes():
         pulse_note=state["pulse_note"],
         themes=state["themes"],
         review_count=state["review_count"],
+        mcp_command=config.mcp_command,
+        mcp_args=config.mcp_args,
         fee_explanation=state["fee_explanation"],
     )
     state["actions_taken"].append(f"✅ Appended to notes: {path}")
@@ -265,6 +267,8 @@ def approve_both():
         pulse_note=state["pulse_note"],
         themes=state["themes"],
         review_count=state["review_count"],
+        mcp_command=config.mcp_command,
+        mcp_args=config.mcp_args,
         fee_explanation=state["fee_explanation"],
     )
     draft_id = create_email_draft(

@@ -79,11 +79,11 @@ class Config:
 
     # ── MCP Server ───────────────────────────────────────────────────────
     mcp_command: str = field(
-        default_factory=lambda: os.getenv("MCP_COMMAND", "npx")
+        default_factory=lambda: os.getenv("MCP_COMMAND", "python")
     )
     mcp_args: list[str] = field(
         default_factory=lambda: os.getenv(
-            "MCP_ARGS", "-y,@modelcontextprotocol/server-everything"
+            "MCP_ARGS", "phase6_approval/google_docs_mcp.py"
         ).split(",")
     )
 
