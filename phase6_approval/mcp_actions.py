@@ -103,6 +103,9 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
 
 def create_email_draft(pulse_note: str, email_to: str,
                        gmail_user: str, gmail_app_password: str,
+                       gmail_client_id: str = None,
+                       gmail_client_secret: str = None,
+                       gmail_refresh_token: str = None,
                        fee_explanation: dict | None = None) -> str:
     """
     Create a real email draft in the user's Gmail Drafts folder via API or IMAP.
@@ -124,9 +127,9 @@ def create_email_draft(pulse_note: str, email_to: str,
         body += f"\n*Last checked: {fee_explanation.get('last_checked', today)}*\n"
 
     # Try OAuth2 / Gmail API first (HTTPS)
-    refresh_token = os.getenv("GMAIL_REFRESH_TOKEN")
-    client_id = os.getenv("GMAIL_CLIENT_ID")
-    client_secret = os.getenv("GMAIL_CLIENT_SECRET")
+    refresh_token = gmail_refresh_token or os.getenv("GMAIL_REFRESH_TOKEN")
+    client_id = gmail_client_id or os.getenv("GMAIL_CLIENT_ID")
+    client_secret = gmail_client_secret or os.getenv("GMAIL_CLIENT_SECRET")
 
     if refresh_token and client_id and client_secret:
         try:
