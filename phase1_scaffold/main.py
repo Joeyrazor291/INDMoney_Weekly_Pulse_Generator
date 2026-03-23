@@ -39,6 +39,7 @@ from phase4_theme_engine.fee_explainer import generate_fee_explanation
 from phase5_builder.pulse_builder import build_pulse_note
 from phase6_approval.approval_ui import launch_approval_ui
 from phase6_approval.mcp_actions import append_to_notes, create_email_draft
+from phase8_analytics.history_manager import append_weekly_record
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -248,6 +249,16 @@ def run_pipeline():
     with open(config.outputs_dir / "latest_pulse.json", "w") as f:
         json.dump(latest_data, f, indent=2)
     print("  ✅ Data saved to outputs/latest_pulse.json")
+
+    # ── Phase 8: Append Historical Analytics ─────────────────────────────
+    try:
+        append_weekly_record(
+            review_count=len(clean_reviews),
+            themes=themes_for_ui,
+            avg_rating=0.0  # TODO: Calculate from clean_reviews if score available
+        )
+    except Exception as e:
+        print(f"  ⚠️  Failed to append analytics record: {e}")
 
     # Skip UI launch if running in a GitHub Action Cron
     if os.environ.get("RUN_HEADLESS_PIPELINE_ONLY") == "true":

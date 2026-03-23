@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDMoney Pulse — Analytics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --surface-secondary: #F3F4F6;
+            --border: #E5E7EB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-muted: #9CA3AF;
+            --accent: #10B981;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #F9FAFB !important;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            background: #002B36; color: white; padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo-container { display: flex; align-items: center; gap: 0.5rem; }
+        .logo-text { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+        .logo-text span { color: var(--accent); }
+        .logo-badge { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        .nav-links { display: flex; gap: 2rem; font-size: 0.875rem; font-weight: 500; }
+        .nav-links a { color: #9CA3AF; text-decoration: none; transition: var(--transition); }
+        .nav-links a:hover, .nav-links a.active { color: white; }
+        
+        .container {
+            max-width: 1280px; margin: 0 auto; padding: 2rem;
+            display: grid; grid-template-columns: 1fr; gap: 2rem; /* Full width for Analytics */
+        }
+        .page-header { margin-bottom: 0.5rem; }
+        .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.75rem; }
+        .page-title { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #111827; }
+        .page-subtitle { color: var(--text-secondary); margin-top: 0.5rem; }
+        
+        .card {
+            background: var(--surface); border-radius: 1.5rem; border: 1px solid var(--border);
+            padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);
+        }
+        .card-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+        }
+
+        /* Tables for latest recurring themes */
+        .theme-table { width: 100%; border-collapse: collapse; }
+        .theme-table th, .theme-table td {
+            text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.875rem;
+        }
+        .theme-table th { color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+        .theme-table tr:hover { background: #f9fafb; }
+        .badge {
+            background: rgba(59, 130, 246, 0.1); color: #3b82f6;
+            padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600; font-size: 0.7rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-text">IND<span>money</span></div>
+            <div class="logo-badge">Internal Tools</div>
+        </div>
+        <nav class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/">Approval Gate</a>
+            <a href="/analytics" class="active">Analytics</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <div class="breadcrumbs">
+                <span>Admin Tools</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <span style="font-weight: 600; color: var(--text-primary);">Theme & Sentiment Analytics</span>
+            </div>
+            <h1 class="page-title">Longitudinal Pulse Metrics</h1>
+            <p class="page-subtitle">Track App Review volume spikes and repeating issue patterns over time.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Review Volume Chart -->
+            <div class="card">
+                <h3 class="card-title">Weekly Review Ingestion Volume</h3>
+                <canvas id="volumeChart" height="250"></canvas>
+            </div>
+            
+            <!-- Recurring Issues Table -->
+            <div class="card">
+                <h3 class="card-title">Recent Critical Themes</h3>
+                <table class="theme-table" id="themeTable">
+                    <thead>
+                        <tr>
+                            <th>Identified Date</th>
+                            <th>Theme</th>
+                            <th>Status / Tag</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Inject historical JSON data safely -->
+    <script type="application/json" id="historyData">
+        {{ history_data | tojson | safe }}
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const rawData = document.getElementById("historyData").textContent;
+            let history = [];
+            try {
+                history = JSON.parse(rawData);
+            } catch (e) {
+                console.error("Failed to parse history data", e);
+            }
+
+            // Extract labels (Dates) and data (Review Count)
+            const labels = history.map(row => {
+                const d = new Date(row.timestamp);
+                return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+            });
+            const volumes = history.map(row => row.total_reviews);
+
+            // 1. Render Volume Chart
+            const ctx = document.getElementById('volumeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : ['No Data Yet'],
+                    datasets: [{
+                        label: 'Play Store Reviews Processed',
+                        data: volumes.length ? volumes : [0],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Render Themes Table (Latest 6 themes)
+            const tableBody = document.querySelector("#themeTable tbody");
+            if (history.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#9ca3af;">No historical theme data available yet.</td></tr>`;
+            } else {
+                // Flatten all themes from recent to oldest
+                const allThemes = [];
+                history.slice().reverse().forEach(record => {
+                    const dateStr = new Date(record.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                    (record.themes || []).forEach(t => {
+                        allThemes.push({ date: dateStr, theme: t.theme });
+                    });
+                });
+
+                // Take top 6
+                const recentThemes = allThemes.slice(0, 6);
+                recentThemes.forEach(t => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${t.date}</td>
+                        <td style="font-weight: 500;">${t.theme}</td>
+                        <td><span class="badge">Tracked</span></td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

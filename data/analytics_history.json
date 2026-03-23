@@ -1,0 +1,34 @@
+[
+  {
+    "timestamp": "2026-03-23T16:08:41.276648",
+    "total_reviews": 215,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "Difficulty navigating portfolio view",
+        "summary": "Users have reported issues with the portfolio view, such as the sizing of elements and the inability to customize the layout.",
+        "quote": "Every day at 9:15 AM when I place an order, it shows 'Execute the order after market open' even though the market is already open and LTP is changing. This major glitch has been happening for over a month. Also, in Scalper Mode there is no option to view index and option charts together. Very frustrating experience."
+      },
+      {
+        "theme": "Lack of advanced charting and trading features",
+        "summary": "Customers have requested more advanced charting capabilities, including the ability to view index and option charts together, as well as features like trailing stop-loss, partial exit, and quick exit options.",
+        "quote": "1) trading on chart is not available for any F&O Stocks in Flash trading app. also add trailing stop loss feature,partial exit,Quick exit feature on chart. 2) Please add index / stock chart & Option chart in same window (up & down) so we can check both chart in one page & trade easily.."
+      },
+      {
+        "theme": "Inconsistent and high brokerage charges",
+        "summary": "Some users have complained about the brokerage charges being higher than advertised, with charges of \u20b920 per order instead of the promised \u20b95 per order for F&O trading.",
+        "quote": "Brokerage is 20 not a 5 rs"
+      },
+      {
+        "theme": "Technical issues and app stability",
+        "summary": "Customers have reported various technical issues, such as the app crashing, orders not getting executed, and data lags, which have led to frustrating trading experiences and financial losses.",
+        "quote": "Every day at 9:15 AM when I place an order, it shows 'Execute the order after market open' even though the market is already open and LTP is changing. This major glitch has been happening for over a month. Also, in Scalper Mode there is no option to view index and option charts together. Very frustrating experience."
+      },
+      {
+        "theme": "Lack of key features and customization options",
+        "summary": "Users have requested the addition of features like mutual fund trading, US stock trading, and the ability to customize chart settings and indicators, which are currently missing from the app.",
+        "quote": "Chart is not available for FNO stocks in flash trading. Chart shall be implemented in flash trading. Stop loss and target price shall also required to be included in the app"
+      }
+    ]
+  }
+]

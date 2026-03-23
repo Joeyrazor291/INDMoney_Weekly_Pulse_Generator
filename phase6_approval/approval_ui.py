@@ -24,6 +24,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from phase4_theme_engine.fee_explainer import generate_fee_explanation
 from phase6_approval.mcp_actions import append_to_notes, create_email_draft
+from phase8_analytics.history_manager import get_analytics_history
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +153,17 @@ def index():
     """Render pulse note preview + fee explainer input."""
     _load_latest_pulse_if_headless()
     return _render_approval_page()
+
+
+@app.route("/analytics")
+def analytics():
+    """Render the longitudinal analytics dashboard using Chart.js"""
+    history_data = get_analytics_history()
+    return render_template(
+        "analytics.html",
+        history_data=history_data,
+        now=datetime.now().strftime("%Y-%m-%d %H:%M")
+    )
 
 
 @app.route("/generate_fee", methods=["POST"])
