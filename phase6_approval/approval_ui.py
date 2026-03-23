@@ -120,11 +120,13 @@ def _render_approval_page(success_message: str = None, done: bool = False):
 
 # ── Routes ───────────────────────────────────────────────────────────────────
 
-def _load_latest_pulse_if_headless():
-    """Load the latest generated pulse note if running disconnected from main.py."""
+@app.before_request
+def _ensure_state_initialized():
+    """Ensure the latest pulse and config are loaded before every request (crucial for HF Spaces)."""
     state = app.config["PULSE_STATE"]
+    
+    # Load latest_pulse.json if pulse_note is empty (Git-Sync architecture)
     if not state["pulse_note"] and not state["themes"]:
-        # Try to load from outputs/latest_pulse.json (Git-Sync architecture)
         json_path = PROJECT_ROOT / "outputs" / "latest_pulse.json"
         if json_path.exists():
             try:
@@ -138,20 +140,27 @@ def _load_latest_pulse_if_headless():
             except Exception as e:
                 logger.error(f"Failed to load latest_pulse.json: {e}")
 
-        # Try to re-initialize config for HF Spaces if missing
-        if state["config"] is None:
-            try:
-                from phase1_scaffold.config import load_config
-                from phase1_scaffold.main import create_llm_router
-                state["config"] = load_config()
-                state["router"] = create_llm_router(state["config"])
-            except Exception as e:
-                logger.error(f"Failed to auto-initialize Config/Router: {e}")
+    # Re-initialize config/router for production if missing
+    if state["router"] is None:
+        try:
+            from phase1_scaffold.config import load_config
+            from phase1_scaffold.main import create_llm_router
+            
+            # Note: load_config() calls load_dotenv() from the current env
+            state["config"] = load_config()
+            state["router"] = create_llm_router(state["config"])
+            
+            # Log for debugging (redacted)
+            if state["config"].openrouter_api_key:
+                logger.info("✅ Router successfully initialized in before_request.")
+            else:
+                logger.warning("⚠️  Config loaded but OPENROUTER_API_KEY is missing.")
+        except Exception as e:
+            logger.error(f"Failed to auto-initialize Config/Router: {e}")
 
 @app.route("/")
 def index():
     """Render pulse note preview + fee explainer input."""
-    _load_latest_pulse_if_headless()
     return _render_approval_page()
 
 
