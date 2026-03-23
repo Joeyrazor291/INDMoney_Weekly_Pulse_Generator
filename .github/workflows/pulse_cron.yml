@@ -28,7 +28,7 @@ jobs:
     - name: Run Phase 1 Orchestrator (Pulse Pipeline)
       env:
         # ⚠️ Make sure to add these to your GitHub Repository Secrets!
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         APP_ID: com.indmoney.indstocks
         REVIEW_COUNT: 1000
         WEEKS_BACK: 8

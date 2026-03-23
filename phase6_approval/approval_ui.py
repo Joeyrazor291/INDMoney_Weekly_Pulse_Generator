@@ -183,7 +183,7 @@ def generate_fee():
             "scenario": scenario,
             "bullets": [
                 "Error: AI generation is currently disabled.",
-                "Missing API Keys: Hugging Face Spaces does not have access to your local .env file. Please copy your GROQ_API_KEY from your .env and add it to the 'Settings > Variables and secrets' section of your Hugging Face Space."
+                "Missing API Keys: Hugging Face Spaces does not have access to your local .env file. Please copy your OPENROUTER_API_KEY from your .env and add it to the 'Settings > Variables and secrets' section of your Hugging Face Space."
             ],
             "source_links": [],
             "last_checked": "",

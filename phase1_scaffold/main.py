@@ -31,9 +31,7 @@ from phase1_scaffold.config import load_config
 from phase2.scraper import fetch_reviews, save_reviews
 from phase3_ingestion.ingestor import ingest
 from phase3_ingestion.pii_scrubber import scrub_pii
-from phase4_theme_engine.groq_client import GroqClient
 from phase4_theme_engine.openrouter_client import OpenRouterClient
-from phase4_theme_engine.llm_mcp import LLMMCPRouter
 from phase4_theme_engine.engine import analyze_reviews
 from phase4_theme_engine.fee_explainer import generate_fee_explanation
 from phase5_builder.pulse_builder import build_pulse_note
@@ -80,10 +78,8 @@ def phase3_ingest_and_scrub(config, raw_path):
 
 
 def create_llm_router(config):
-    """Create the MCP-based LLM router from config."""
-    groq = GroqClient(api_key=config.groq_api_key, model=config.groq_model)
-    openrouter = OpenRouterClient(api_key=config.openrouter_api_key, model=config.openrouter_model)
-    return LLMMCPRouter(openrouter_client=openrouter, groq_client=groq)
+    """Create the OpenRouter LLM client from config."""
+    return OpenRouterClient(api_key=config.openrouter_api_key, model=config.openrouter_model)
 
 
 def phase4_theme_engine(router, clean_reviews):
@@ -106,11 +102,6 @@ def phase4_theme_engine(router, clean_reviews):
             for i, idea in enumerate(result.action_ideas, 1):
                 print(f"      • {idea}")
 
-        # Log token status
-        status = router.get_token_status()
-        print(f"\n    📊 MCP Token Status: Groq remaining ~{status['groq_remaining']} | "
-              f"Groq calls: {status['groq_calls']} | OpenRouter calls: {status['openrouter_calls']}")
-                
         return result
     except Exception as e:
         print(f"  ❌ Theme analysis failed: {e}")

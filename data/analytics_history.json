@@ -30,5 +30,71 @@
         "quote": "Chart is not available for FNO stocks in flash trading. Chart shall be implemented in flash trading. Stop loss and target price shall also required to be included in the app"
       }
     ]
+  },
+  {
+    "timestamp": "2026-03-23T21:48:39.583927",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "App Performance & Stability",
+        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
+        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
+      },
+      {
+        "theme": "User Interface Refinement",
+        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
+        "quote": "Love the features but the text is a bit too small on the main screen."
+      },
+      {
+        "theme": "Transparency in Fee Structure",
+        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
+        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-23T21:49:25.344292",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "App Performance & Stability",
+        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
+        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
+      },
+      {
+        "theme": "User Interface Refinement",
+        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
+        "quote": "Love the features but the text is a bit too small on the main screen."
+      },
+      {
+        "theme": "Transparency in Fee Structure",
+        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
+        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-23T21:50:14.193889",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "App Performance & Stability",
+        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
+        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
+      },
+      {
+        "theme": "User Interface Refinement",
+        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
+        "quote": "Love the features but the text is a bit too small on the main screen."
+      },
+      {
+        "theme": "Transparency in Fee Structure",
+        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
+        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
+      }
+    ]
   }
 ]

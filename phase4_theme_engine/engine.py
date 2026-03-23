@@ -135,11 +135,11 @@ def analyze_reviews(router, reviews: List[Dict]) -> ThemeResult:
             print(f"      🔂 Quote empty for '{theme.theme}' — Retrying via Robust Fallback (Gemini 2.0)...")
             try:
                 # Use OpenRouter but with a more powerful model than Haiku
-                fallback_resp = router.openrouter.chat_completion(
+                fallback_resp = router.chat_completion(
                     QUOTE_EXTRACTION_SYSTEM_V2.format(theme=theme.theme, summary=theme.summary),
                     quote_prompt,
                     retries=2,
-                    model_override="google/gemini-2.0-flash-001"
+                    model_override="google/gemini-2.0-flash-lite-preview-02-05:free"
                 )
                 
                 # Note: openrouter.chat_completion might still use the default model from .env 

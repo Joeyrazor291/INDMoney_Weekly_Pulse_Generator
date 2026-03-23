@@ -30,15 +30,7 @@ class Config:
     Sensible defaults are provided where applicable.
     """
 
-    # ── Groq LLM ─────────────────────────────────────────────────────────
-    groq_api_key: str = field(
-        default_factory=lambda: os.getenv("GROQ_API_KEY", "")
-    )
-    groq_model: str = field(
-        default_factory=lambda: os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-    )
-
-    # ── OpenRouter (Theme Generation — Call #1) ──────────────────────────
+    # ── OpenRouter (LLM Engine) ──────────────────────────────────────────────
     openrouter_api_key: str = field(
         default_factory=lambda: os.getenv("OPENROUTER_API_KEY", "")
     )
@@ -143,8 +135,8 @@ class Config:
             List of warning messages (empty if all OK).
         """
         warnings = []
-        if not self.groq_api_key:
-            warnings.append("⚠️  GROQ_API_KEY is not set — LLM calls will fail.")
+        if not self.openrouter_api_key:
+            warnings.append("⚠️  OPENROUTER_API_KEY is not set — LLM calls will fail.")
         if not self.email_to:
             warnings.append("⚠️  EMAIL_TO is not set — email drafts will lack a recipient.")
         if not self.google_doc_id:
@@ -163,8 +155,8 @@ class Config:
         """Redact secrets when printing config."""
         return (
             f"Config(\n"
-            f"  groq_api_key={'***' if self.groq_api_key else '(not set)'},\n"
-            f"  groq_model={self.groq_model!r},\n"
+            f"  openrouter_api_key={'***' if self.openrouter_api_key else '(not set)'},\n"
+            f"  openrouter_model={self.openrouter_model!r},\n"
             f"  app_id={self.app_id!r},\n"
             f"  review_count={self.review_count},\n"
             f"  weeks_back={self.weeks_back},\n"
