@@ -25,8 +25,18 @@ if str(PROJECT_ROOT) not in sys.path:
 from phase4_theme_engine.fee_explainer import generate_fee_explanation
 from phase6_approval.mcp_actions import append_to_notes, create_email_draft
 from phase8_analytics.history_manager import get_analytics_history
+import traceback
 
 logger = logging.getLogger(__name__)
+
+# ── Error Handler ────────────────────────────────────────────────────────────
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Log the error and return a friendly-ish error page with traceback."""
+    logger.error(f"Unhandled Exception: {e}")
+    tb = traceback.format_exc()
+    return f"<h1>500 Internal Server Error</h1><pre>{tb}</pre>", 500
 
 # ── Flask App ────────────────────────────────────────────────────────────────
 
