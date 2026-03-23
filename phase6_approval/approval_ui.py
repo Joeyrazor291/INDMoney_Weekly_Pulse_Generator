@@ -226,6 +226,7 @@ def generate_fee():
 @app.route("/debug/config")
 def debug_config():
     """Return non-sensitive config for debugging production mismatches."""
+    from .mcp_actions import LAST_MCP_ERROR
     state = app.config.get("PULSE_STATE", {})
     config = state.get("config")
     if not config:
@@ -236,6 +237,9 @@ def debug_config():
         "mcp_command": config.mcp_command,
         "mcp_args": config.mcp_args,
         "gmail_user": config.gmail_user,
+        "openrouter_key_present": bool(config.openrouter_api_key),
+        "google_creds_preview": (config.google_docs_credentials[:30] + "...") if config.google_docs_credentials else "missing",
+        "last_mcp_error": LAST_MCP_ERROR,
         "status": "active"
     }
 

@@ -14,6 +14,9 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from pathlib import Path
 
+# Tracking last error for production debugging
+LAST_MCP_ERROR = None
+
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -75,15 +78,19 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
                 return result
 
     try:
+        global LAST_MCP_ERROR
         result = asyncio.run(_run_mcp())
         # The result is a CallToolResult. Check content for error messages.
         if hasattr(result, "content") and result.content:
             for item in result.content:
-                if hasattr(item, "text") and item.text.startswith("Error:"):
-                    raise RuntimeError(item.text)
+                text = item.text if hasattr(item, "text") else str(item)
+                if "Error" in text or "Exception" in text or "failed" in text.lower():
+                    LAST_MCP_ERROR = text
+                    raise RuntimeError(text)
         
         logger.info(f"Appended notes to Google Doc ID: {google_doc_id}")
     except Exception as e:
+        LAST_MCP_ERROR = str(e)
         logger.error(f"Failed to append to Google Doc via MCP: {e}")
         raise RuntimeError(f"MCP Action Failed: {e}")
 
