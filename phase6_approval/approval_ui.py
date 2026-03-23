@@ -223,6 +223,22 @@ def generate_fee():
     return redirect(url_for("index"))
 
 
+@app.route("/debug/config")
+def debug_config():
+    """Return non-sensitive config for debugging production mismatches."""
+    state = app.config.get("PULSE_STATE", {})
+    config = state.get("config")
+    if not config:
+        return "Not initialized", 404
+        
+    return {
+        "google_doc_id": config.google_doc_id,
+        "mcp_command": config.mcp_command,
+        "mcp_args": config.mcp_args,
+        "gmail_user": config.gmail_user,
+        "status": "active"
+    }
+
 @app.route("/approve/notes", methods=["POST"])
 def approve_notes():
     """Append pulse + fee data to live Google Doc."""
