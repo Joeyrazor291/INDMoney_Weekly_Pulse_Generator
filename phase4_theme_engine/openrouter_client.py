@@ -36,9 +36,6 @@ class OpenRouterClient:
             "X-Title": "INDMoney Pulse Generator",
         }
 
-        # Check if system prompt requests JSON
-        wants_json = "json" in system_prompt.lower()
-
         payload = {
             "model": target_model,
             "messages": [
@@ -47,9 +44,6 @@ class OpenRouterClient:
             ],
             "temperature": 0.1,
         }
-
-        if wants_json:
-            payload["response_format"] = {"type": "json_object"}
 
         for attempt in range(retries):
             try:
@@ -102,6 +96,20 @@ class OpenRouterClient:
                     content = "\n".join(lines).strip()
 
                 return content
+
+            except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 402:
+                    logger.warning(f"402 Payment Required for {target_model}. Automatically falling back to free tier model.")
+                    print(f"      💰 Out of credits for {target_model}. Falling back to free model...")
+                    target_model = "liquid/lfm-2.5-1.2b-thinking:free"
+                    payload["model"] = target_model
+                    continue # Try again immediately with the free model
+                
+                if attempt == retries - 1:
+                    raise RuntimeError(f"OpenRouter API failed after {retries} attempts. Last error: {e}")
+                wait = 2 ** attempt
+                logger.warning(f"OpenRouter API error on attempt {attempt + 1}: {e}. Retrying in {wait}s...")
+                time.sleep(wait)
 
             except (requests.RequestException, KeyError, IndexError) as e:
                 if attempt == retries - 1:
