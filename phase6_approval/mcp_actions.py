@@ -65,7 +65,11 @@ def append_to_notes(google_doc_id: str, pulse_note: str,
     args = mcp_args or ["phase6_approval/google_docs_mcp.py"]
 
     async def _run_mcp():
-        server_params = StdioServerParameters(command=command, args=args)
+        server_params = StdioServerParameters(
+            command=command, 
+            args=args,
+            env=os.environ.copy()
+        )
         async with stdio_client(server_params) as (read, write):
             async with ClientSession(read, write) as session:
                 await session.initialize()

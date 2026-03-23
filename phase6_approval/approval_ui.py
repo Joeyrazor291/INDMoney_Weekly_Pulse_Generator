@@ -240,6 +240,8 @@ def debug_config():
         "openrouter_key_present": bool(config.openrouter_api_key),
         "google_creds_preview": (config.google_docs_credentials[:30] + "...") if config.google_docs_credentials else "missing",
         "last_mcp_error": LAST_MCP_ERROR,
+        "fee_explanation_present": bool(state.get("fee_explanation")),
+        "fee_explanation_error": state.get("fee_explanation", {}).get("bullets", [""])[0] if state.get("fee_explanation", {}).get("bullets") and "Error" in state.get("fee_explanation", {}).get("bullets")[0] else None,
         "status": "active"
     }
 

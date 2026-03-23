@@ -11,8 +11,11 @@ from googleapiclient.discovery import build
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("google-docs-mcp")
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (try-except for production environments without .env)
+try:
+    load_dotenv()
+except Exception:
+    pass
 
 # Initialize FastMCP server
 mcp = FastMCP("Google Docs (Internal)")
@@ -21,16 +24,24 @@ def get_docs_service():
     """Authenticate and return the Google Docs API service."""
     creds_json = os.getenv("GOOGLE_DOCS_CREDENTIALS")
     if not creds_json:
-        raise ValueError("GOOGLE_DOCS_CREDENTIALS not found in .env")
+        # Fallback check for common typo
+        creds_json = os.getenv("GOOGLE_CREDENTIALS")
+        
+    if not creds_json:
+        raise ValueError("GOOGLE_DOCS_CREDENTIALS environment variable is missing.")
     
     try:
-        # Some users might paste it with extra quotes or as a path
-        if creds_json.startswith("{"):
+        # 1. Try to parse as JSON string (standard for HF Secrets)
+        if creds_json.strip().startswith("{"):
             info = json.loads(creds_json)
-        else:
-            # Assume it's a file path
+            logger.info("Successfully loaded credentials from JSON string.")
+        # 2. Try to load from file path (standard for local dev)
+        elif os.path.exists(creds_json):
             with open(creds_json, 'r') as f:
                 info = json.load(f)
+            logger.info(f"Successfully loaded credentials from file: {creds_json}")
+        else:
+            raise ValueError(f"Credentials value is neither a JSON string nor a valid file path: {creds_json[:20]}...")
                 
         credentials = service_account.Credentials.from_service_account_info(
             info, scopes=["https://www.googleapis.com/auth/documents"]
