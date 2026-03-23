@@ -11,6 +11,8 @@ import time
 import json
 import logging
 import requests
+import re
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -68,15 +70,19 @@ class OpenRouterClient:
                     return ""
 
                 content = data["choices"][0]["message"]["content"]
+                
+                # Check if we need to extract JSON from a potentially cluttered response
+                if "json" in system_prompt.lower() or "json" in user_prompt.lower():
+                    content = self._extract_json(content)
 
                 if content is None:
                     logger.warning("OpenRouter returned empty content.")
                     return ""
 
                 # LFM2.5-Thinking models may wrap output in <think>...</think> tags
-
-                # Strip the thinking section and return only the final answer
-                if "<think>" in content:
+                # This logic is now largely handled by _extract_json if JSON is expected.
+                # If not expecting JSON, we still want to strip thinking tags.
+                if "<think>" in content and not ("json" in system_prompt.lower() or "json" in user_prompt.lower()):
                     # Everything after </think> is the actual response
                     parts = content.split("</think>")
                     if len(parts) > 1:
@@ -86,7 +92,9 @@ class OpenRouterClient:
                         content = content.split("<think>")[-1].strip()
 
                 # Strip markdown code fences (```json ... ```) that some models add
-                if content.startswith("```"):
+                # This is also largely handled by _extract_json if JSON is expected.
+                # If not expecting JSON, we still want to strip markdown fences.
+                if content.startswith("```") and not ("json" in system_prompt.lower() or "json" in user_prompt.lower()):
                     lines = content.split("\n")
                     # Remove first line (```json) and last line (```)
                     if lines[-1].strip() == "```":

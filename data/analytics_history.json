@@ -96,5 +96,49 @@
         "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
       }
     ]
+  },
+  {
+    "timestamp": "2026-03-23T22:15:43.487155",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "High Brokerage Fees",
+        "summary": "App charges excessive fees, leading to dissatisfaction despite good features.",
+        "quote": ""
+      },
+      {
+        "theme": "Missing Key Features",
+        "summary": "Critical features like SL limits and option charts are absent, hindering usability.",
+        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing..."
+      },
+      {
+        "theme": "Technical Glitches",
+        "summary": "Frequent crashes and performance issues disrupt trading experiences.",
+        "quote": "Frequent crashes and performance issues disrupt trading experiences."
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-23T22:19:55.213939",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "App Performance & Stability",
+        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
+        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
+      },
+      {
+        "theme": "User Interface Refinement",
+        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
+        "quote": "Love the features but the text is a bit too small on the main screen."
+      },
+      {
+        "theme": "Transparency in Fee Structure",
+        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
+        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
+      }
+    ]
   }
 ]

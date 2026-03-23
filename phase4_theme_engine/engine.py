@@ -139,7 +139,7 @@ def analyze_reviews(router, reviews: List[Dict]) -> ThemeResult:
                     QUOTE_EXTRACTION_SYSTEM_V2.format(theme=theme.theme, summary=theme.summary),
                     quote_prompt,
                     retries=2,
-                    model_override="google/gemini-2.0-flash-lite-preview-02-05:free"
+                    model_override="liquid/lfm-2.5-1.2b-thinking:free"
                 )
                 
                 # Note: openrouter.chat_completion might still use the default model from .env 
