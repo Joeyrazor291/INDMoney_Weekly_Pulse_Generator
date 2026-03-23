@@ -98,6 +98,9 @@ class OpenRouterClient:
                 return content
 
             except requests.exceptions.HTTPError as e:
+                if e.response.status_code == 401:
+                    raise RuntimeError("401 Unauthorized: Your OpenRouter API Key is missing or invalid. Please check your .env file or Hugging Face Secrets.")
+                    
                 if e.response.status_code == 402:
                     logger.warning(f"402 Payment Required for {target_model}. Automatically falling back to free tier model.")
                     print(f"      💰 Out of credits for {target_model}. Falling back to free model...")
