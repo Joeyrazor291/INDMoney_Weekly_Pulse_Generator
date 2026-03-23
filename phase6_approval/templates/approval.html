@@ -677,6 +677,30 @@
                     </div>
                 </div>
 
+                <div style="margin-bottom: 2rem;">
+                    <label for="pulse_note_editor" style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.75rem;">
+                        Verified Analysis Summary (Editable)
+                    </label>
+                    <textarea 
+                        id="pulse_note_editor" 
+                        name="pulse_note" 
+                        form="approval-form-notes"
+                        style="width: 100%; min-height: 250px; padding: 1.25rem; border-radius: 1rem; border: 1px solid var(--border); font-family: inherit; font-size: 0.9375rem; color: var(--text-primary); line-height: 1.6; resize: vertical; background: #fffcf0; border-color: #fde68a;"
+                        placeholder="Drafting weekly pulse note..."
+                    >{{ pulse_note }}</textarea>
+                    <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 4px; vertical-align: middle;"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                        This note will be used for both Google Docs and the Email Draft.
+                    </p>
+                </div>
+
+                <div class="card-title-group" style="margin-bottom: 1.5rem; border-top: 1px solid var(--border); padding-top: 2rem;">
+                    <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <div class="card-title">Categorized Themes</div>
+                </div>
+
                 <div class="theme-section">
                     {% for th_item in pulse_themes %}
                     <div class="theme-item">
@@ -754,8 +778,8 @@
                     </div>
 
                     <div class="approvals-list">
-                        <form method="POST" action="/approve/notes">
-                            <button type="submit" class="approval-item">
+                        <form id="approval-form" method="POST">
+                            <button type="submit" formaction="/approve/notes" class="approval-item">
                                 <div class="approval-content">
                                     <div class="approval-icon">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
@@ -767,10 +791,8 @@
                                 </div>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
-                        </form>
 
-                        <form method="POST" action="/approve/email">
-                            <button type="submit" class="approval-item">
+                            <button type="submit" formaction="/approve/email" class="approval-item" style="margin-top: 1rem;">
                                 <div class="approval-content">
                                     <div class="approval-icon" style="background: rgba(108, 99, 255, 0.1); color: #6c63ff;">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
@@ -782,21 +804,19 @@
                                 </div>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </button>
+
+                            <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem;">
+                                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                                <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or Complete</span>
+                                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                            </div>
+
+                            <button type="submit" formaction="/approve/both" class="btn-primary-large">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Do Both & Finish
+                            </button>
                         </form>
                     </div>
-
-                    <div style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem;">
-                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
-                        <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Or Complete</span>
-                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
-                    </div>
-
-                    <form method="POST" action="/approve/both">
-                        <button type="submit" class="btn-primary-large">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            Do Both & Finish
-                        </button>
-                    </form>
 
                     <div class="sidebar-info-box">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; color: var(--text-muted);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>

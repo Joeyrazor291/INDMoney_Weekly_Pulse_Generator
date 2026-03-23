@@ -228,6 +228,11 @@ def approve_notes():
     """Append pulse + fee data to live Google Doc."""
     state = app.config["PULSE_STATE"]
     config = state["config"]
+    
+    # Update state with potentially edited content from the form
+    if "pulse_note" in request.form:
+        state["pulse_note"] = request.form.get("pulse_note")
+
     path = append_to_notes(
         google_doc_id=config.google_doc_id,
         pulse_note=state["pulse_note"],
@@ -246,11 +251,19 @@ def approve_email():
     """Create email draft in Gmail."""
     state = app.config["PULSE_STATE"]
     config = state["config"]
+
+    # Update state with potentially edited content from the form
+    if "pulse_note" in request.form:
+        state["pulse_note"] = request.form.get("pulse_note")
+
     draft_id = create_email_draft(
         pulse_note=state["pulse_note"],
         email_to=config.email_to,
         gmail_user=config.gmail_user,
         gmail_app_password=config.gmail_app_password,
+        gmail_client_id=config.gmail_client_id,
+        gmail_client_secret=config.gmail_client_secret,
+        gmail_refresh_token=config.gmail_refresh_token,
         fee_explanation=state["fee_explanation"],
     )
     state["actions_taken"].append(f"✅ Gmail draft created: {draft_id}")
@@ -262,6 +275,11 @@ def approve_both():
     """Append to notes AND create Gmail draft."""
     state = app.config["PULSE_STATE"]
     config = state["config"]
+
+    # Update state with potentially edited content from the form
+    if "pulse_note" in request.form:
+        state["pulse_note"] = request.form.get("pulse_note")
+
     notes_path = append_to_notes(
         google_doc_id=config.google_doc_id,
         pulse_note=state["pulse_note"],
@@ -276,6 +294,9 @@ def approve_both():
         email_to=config.email_to,
         gmail_user=config.gmail_user,
         gmail_app_password=config.gmail_app_password,
+        gmail_client_id=config.gmail_client_id,
+        gmail_client_secret=config.gmail_client_secret,
+        gmail_refresh_token=config.gmail_refresh_token,
         fee_explanation=state["fee_explanation"],
     )
     state["actions_taken"].append(f"✅ Notes: {notes_path}")
