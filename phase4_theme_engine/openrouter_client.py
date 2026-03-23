@@ -134,3 +134,26 @@ class OpenRouterClient:
                 time.sleep(wait)
 
         return ""
+
+    def _extract_json(self, text: str) -> str:
+        """
+        Robustly extract JSON from a string that might contain other text
+        like <thought> tags or markdown code blocks.
+        """
+        # Try to find content between ```json and ```
+        json_match = re.search(r"```json\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+        if json_match:
+            return json_match.group(1).strip()
+            
+        # Try to find content between ``` and ```
+        json_match = re.search(r"```\s*(\{.*?\})\s*```", text, re.DOTALL | re.IGNORECASE)
+        if json_match:
+            return json_match.group(1).strip()
+            
+        # Fallback: Find the first { and the last }
+        first_brace = text.find("{")
+        last_brace = text.rfind("}")
+        if first_brace != -1 and last_brace != -1:
+            return text[first_brace:last_brace+1].strip()
+            
+        return text.strip()
