@@ -215,6 +215,8 @@ def generate_fee():
         explanation = generate_fee_explanation(router, scenario)
         state["fee_explanation"] = explanation
     except Exception as e:
+        global LAST_EXCEPTION
+        LAST_EXCEPTION = traceback.format_exc()
         logger.error(f"Fee explanation failed: {e}")
         state["fee_explanation"] = {
             "scenario": scenario,

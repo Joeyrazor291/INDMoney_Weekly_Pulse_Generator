@@ -69,7 +69,7 @@ class OpenRouterClient:
                     logger.warning(f"OpenRouter response missing 'choices': {data}")
                     return ""
 
-                content = data["choices"][0]["message"]["content"]
+                content = data["choices"][0]["message"].get("content") or ""
                 
                 # Check if we need to extract JSON from a potentially cluttered response
                 if "json" in system_prompt.lower() or "json" in user_prompt.lower():
