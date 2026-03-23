@@ -11,10 +11,9 @@ pinned: false
 
 ![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
 ![OpenRouter](https://img.shields.io/badge/LLM-OpenRouter-blueviolet)
-![Groq](https://img.shields.io/badge/Fallback-Groq-orange)
 ![Flask](https://img.shields.io/badge/UI-Flask-lightgrey)
 
-An automated AI pipeline that scrapes Google Play Store reviews, scrubs PII, and uses OpenRouter's LLMs (with a dynamic fallback to Groq natively) to analyze user sentiment. It generates a concise, actionable weekly pulse note for Product Managers to track recurring themes, user quotes, and concrete improvement ideas.
+An automated AI pipeline that scrapes Google Play Store reviews, scrubs PII, and uses OpenRouter's HTTP APIs (with dynamic fallbacks) to analyze user sentiment. It generates a concise, actionable weekly pulse note for Product Managers to track recurring themes, user quotes, and concrete improvement ideas.
 
 ## 🌟 Why This Exists?
 
@@ -27,7 +26,7 @@ Product, support, and leadership teams need a recurring view of what users are s
 
 - **Automated Scraping**: Fetches up to 1000 of the latest Play Store reviews.
 - **Zero PII Leakage**: Aggressive Regex scrubbing strips emails, phone numbers (Indian & Intl), and sensitive URLs before data ever touches an LLM.
-- **Smart Theme Engine**: Routes LLM requests dynamically by using **OpenRouter** as the primary inference engine, with an automatic fallback to **Groq** if any rate limits or errors occur. This ensures zero downtime when extracting the top 3-5 distinct themes.
+- **Smart Theme Engine**: Routes LLM requests dynamically by using **OpenRouter** as the primary inference engine, with an automatic fallback mechanism to alternative free-tier models if any rate limits or errors occur. This ensures zero downtime when extracting the top 3-5 distinct themes.
 - **Approval-Gated Actions**: Runs a local Flask UI on `localhost:5050` where a human can review the AI's output before committing it.
 - **MCP Integration (Google Docs)**: Once approved, the Markdown pulse note is appended magically to a persistent Google Document.
 - **Bonus! Fee Explainer**: A built-in LLM tool for the support team to quickly generate unbiased fee explanations structured in < 6 bullet points.
@@ -37,7 +36,7 @@ Product, support, and leadership teams need a recurring view of what users are s
 - **Core**: Python 3.10+
 - **Scraper**: `google-play-scraper`
 - **Data Prep**: `pandas`
-- **AI/LLM**: `openrouter` (Primary) + `groq` (Fallback)
+- **AI/LLM**: `openrouter`
 - **UI Approval Gate**: `flask`
 - **Tool Calling (Google Docs)**: Model Context Protocol (`mcp`)
 - **CI/CD Automation**: GitHub Actions (Weekly Cron)
@@ -75,7 +74,7 @@ The pipeline processes data through 6 phases:
    cp .env.example .env
    ```
    *Required Keys inside `.env`:*
-   - `GROQ_API_KEY`: Your Groq API key
+   - `OPENROUTER_API_KEY`: Your OpenRouter API key
    - `APP_ID`: `com.indmoney.indstocks`
 
 ## 🏃‍♂️ Running the Pipeline
@@ -87,7 +86,7 @@ python phase1_scaffold/main.py
 
 **What happens?**
 1. It downloads the reviews to `data/raw`.
-2. Cleaned data is sent to Groq.
+2. Cleaned data is sent to OpenRouter.
 3. A browser window will automatically launch at `http://localhost:5050` for the Approval UI.
 4. Review the generated pulse, and click exactly how you want it delivered!
 

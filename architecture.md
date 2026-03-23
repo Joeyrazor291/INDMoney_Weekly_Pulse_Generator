@@ -14,7 +14,7 @@
 4. [Phase 1 — Project Scaffold & Configuration](#phase-1--project-scaffold--configuration)
 5. [Phase 2 — Play Store Review Scraper](#phase-2--play-store-review-scraper)
 6. [Phase 3 — Data Ingestion & PII Scrubbing](#phase-3--data-ingestion--pii-scrubbing)
-7. [Phase 4 — LLM Theme Engine (Groq)](#phase-4--llm-theme-engine-groq)
+7. [Phase 4 — LLM Theme Engine](#phase-4--llm-theme-engine)
 8. [Phase 5 — Weekly Pulse Note Builder](#phase-5--weekly-pulse-note-builder)
 9. [Phase 6 — MCP Approval-Gated Actions](#phase-6--mcp-approval-gated-actions)
 10. [Phase 7 — Verification & Testing](#phase-7--verification--testing)
@@ -38,7 +38,7 @@ An automated pipeline that:
 
 1. **Scrapes** the latest 8–12 weeks of Google Play Store reviews for INDMoney
 2. **Cleans** and **de-identifies** the data (no PII)
-3. **Groups** reviews into 3–5 themes using an LLM (Groq)
+3. **Groups** reviews into 3–5 themes using an LLM (OpenRouter)
 4. **Generates** a ≤250-word, scannable weekly pulse note with top themes, user quotes, and action ideas
 5. **Delivers** the note as an email draft via an approval-gated workflow (no auto-send)
 
@@ -61,7 +61,7 @@ flowchart TD
     A["🏪 Phase 2 · Play Store Scraper\n(google-play-scraper · last 8–12 weeks)"] --> B
     Z["📄 Fallback: CSV/JSON Drop\n(manual export)"] --> B
     B["📥 Phase 3 · Data Ingestor\n(normalise + 56-day date filter)"] --> C["🧹 Phase 3 · PII Scrubber\n(strip names, emails, phones, IDs)"]
-    C --> D["🤖 Phase 4 · Groq LLM Engine\n(3–5 themes · top quotes · action ideas)"]
+    C --> D["🤖 Phase 4 · Theme Engine\n(3–5 themes · top quotes · action ideas)"]
     D --> E["📝 Phase 5 · Pulse Note Builder\n(Jinja2 template · ≤250 words)"]
     E --> F{"🔐 Phase 6 · Approval Gate\n(Flask UI on localhost:5050)"}
     F -->|Approved: Notes| G["📄 Append to Google Doc\n(Google Drive MCP Server)"]
@@ -86,8 +86,8 @@ graph LR
     subgraph "Processing Layer"
         ING --> PII[pii_scrubber.py]
         PII --> TE[theme_engine.py]
-        TE --> GC[groq_client.py]
-        GC --> |API Call| GROQ((Groq Cloud API))
+        TE --> ORC[openrouter_client.py]
+        ORC --> |API Call| OPENROUTER((OpenRouter API))
     end
 
     subgraph "Presentation Layer"
@@ -119,7 +119,7 @@ graph LR
 | **Language** | Python 3.10+ | Core runtime |
 | **Review Scraping** | `google-play-scraper` ≥ 1.2.4 | Fetch public Play Store reviews (no API key needed) |
 | **Data Processing** | `pandas` ≥ 2.0.0 | DataFrame operations, date filtering, normalisation |
-| **LLM** | `groq` SDK ≥ 0.9.0 | Chat completions via Groq Cloud (llama-3.3-70b-versatile) |
+| **LLM** | `requests` ≥ 2.25.0 | Chat completions via OpenRouter HTTP API |
 | **Templating** | `jinja2` ≥ 3.1.0 | Markdown pulse note rendering |
 | **Web UI** | `flask` ≥ 3.0.0 | Approval gate UI (localhost:5050) |
 | **MCP Client** | `mcp` SDK | Tool-calling for downstream actions (Notes, Email) |
@@ -154,7 +154,7 @@ INDMoney_Pulse_Generator/
 │   ├── ingestor.py                 # CSV/JSON loader + date filter
 │   └── pii_scrubber.py             # PII removal
 ├── phase4_theme_engine/
-│   ├── groq_client.py              # Groq API wrapper
+│   ├── openrouter_client.py        # OpenRouter API wrapper
 │   └── theme_engine.py             # Theme generation + quote + action extraction
 ├── phase5_builder/
 │   ├── pulse_builder.py            # Note assembly
@@ -197,7 +197,7 @@ pytest
 #### `.env.example`
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+OPENROUTER_API_KEY=your_openrouter_api_key_here
 APP_ID=com.indmoney.indstocks
 REVIEW_COUNT=1000
 WEEKS_BACK=8
@@ -219,7 +219,7 @@ MCP_ARGS=-y,@modelcontextprotocol/server-everything
 │  Phase 1: Load config from .env                │
 │  Phase 2: Scrape Play Store → data/raw/*.json  │
 │  Phase 3: Ingest + PII scrub → clean records   │
-│  Phase 4: Groq LLM → themes, quotes, actions   │
+│  Phase 4: OpenRouter LLM → themes, quotes, actions │
 │  Phase 5: Build pulse note (≤250 words)         │
 ├────────────────────────────────────────────────┤
 │  ⚠️  APPROVAL GATE (Flask UI @ :5050)           │
@@ -378,81 +378,15 @@ flowchart LR
 
 ---
 
-## Phase 4 — LLM Theme Engine (MCP-Based Token-Aware Routing)
+## Phase 4 — LLM Theme Engine
 
 ### Goal
 
 Use LLMs to generate themes from review data, extract representative quotes, and produce actionable product improvement ideas.
 
-### Architecture Decision: MCP-Based LLM Routing
+### Architecture Decision: OpenRouter API
 
-An **internal MCP server** acts as the intelligent routing layer for all LLM calls. It tracks Groq's remaining token quota (via `x-ratelimit-remaining-tokens` response headers) and proactively routes calls to the best available provider.
-
-```mermaid
-flowchart LR
-    CALL[LLM Call] --> MCP["MCP Server\n(Token Tracker)"]
-    MCP -->|Groq has tokens| GR[Groq API]
-    MCP -->|Groq low/exhausted| OR[OpenRouter API]
-    GR -->|Response + x-ratelimit headers| MCP
-    OR -->|Response| MCP
-    MCP --> RESULT[Response to caller]
-```
-
-#### Routing Logic
-
-1. **Check Groq quota** — read cached `remaining_tokens` from last Groq response header
-2. **If Groq has enough tokens** (remaining > estimated request size) → use Groq
-3. **If Groq is low or exhausted** → route to OpenRouter
-4. **On Groq 429 error** → update cache, retry via OpenRouter
-
-| Call | Purpose | Routing |
-|---|---|---|
-| #1 | Theme generation | MCP decides (Groq or OpenRouter) |
-| #2 | Quote extraction (×N) | MCP decides |
-| #3 | Action ideas | MCP decides |
-| Fee | Fee Explainer (on-demand) | MCP decides |
-
-### Module: `phase4_theme_engine/llm_mcp.py`
-
-Internal MCP server that exposes LLM routing as a tool.
-
-#### API Contract
-
-```python
-class LLMMCPRouter:
-    def __init__(self, openrouter: OpenRouterClient, groq: GroqClient,
-                 groq_daily_limit: int = 100_000):
-        """Initialise with both providers and Groq's daily token limit."""
-
-    def get_token_status(self) -> dict:
-        """
-        Returns current token availability:
-        {"groq_remaining": int, "groq_used": int, "provider": "groq"|"openrouter"}
-        """
-
-    def chat_completion(self, system_prompt: str, user_prompt: str) -> str:
-        """
-        Routes to best provider based on token availability.
-        Updates internal token tracker from Groq response headers.
-        Same interface as GroqClient/OpenRouterClient.
-        """
-```
-
-### Module: `phase4_theme_engine/groq_client.py`
-
-#### API Contract
-
-```python
-class GroqClient:
-    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
-        """Initialise Groq SDK client."""
-
-    def chat_completion(self, system_prompt: str, user_prompt: str) -> str:
-        """
-        Send a chat completion request.
-        Retries up to 3 times with exponential backoff on failure.
-        """
-```
+We route all LLM requests through **OpenRouter** using the `anthropic/claude-3-haiku` model (or fallback models like `google/gemini-2.0-flash-lite-preview` for robust quote extraction).
 
 ### Module: `phase4_theme_engine/openrouter_client.py`
 
@@ -553,7 +487,7 @@ Generate a structured, neutral explanation for a specific fee scenario (e.g., br
 1. User enters scenario in Approval UI.
 2. UI calls `fee_explainer.generate_explanation(scenario)`.
 3. Engine performs a web search (optional) to find latest data/links.
-4. Engine calls Groq LLM to structure the response.
+4. Engine calls OpenRouter to structure the response.
 5. Response is displayed in UI for preview and included in final output.
 
 #### Official Sources for Reference
@@ -666,8 +600,8 @@ sequenceDiagram
     Main->>Flask: Launch with pulse data
     Flask->>User: Render pulse preview + Fee Explainer Input
     User->>Flask: [Optional] Enter Fee Scenario Topic
-    Flask->>Groq: Generate Fee Explainer (6 bullets + 2 links)
-    Groq-->>Flask: Fee Explanation Data
+    Flask->>OpenRouter: Generate Fee Explainer (6 bullets + 2 links)
+    OpenRouter-->>Flask: Fee Explanation Data
     User->>Flask: Click [Send to Notes]
     Flask->>MCP: call append_to_doc(Pulse + Fee)
     MCP-->>GoogleDocs: Append via Google Drive MCP Server
@@ -834,7 +768,7 @@ flowchart LR
         direction TB
         ING["Ingest\n+ Date Filter"]
         PII["PII Scrub"]
-        LLM["Groq LLM\n(3 calls)"]
+        LLM["OpenRouter\n(3 calls)"]
         BUILD["Pulse Builder\n(Jinja2)"]
 
         ING --> PII --> LLM --> BUILD
@@ -874,7 +808,7 @@ This deployment uses a dual-platform approach to bypass the ephemeral storage li
 
 ### Data Flow
 1. **[GitHub]** Actions Cron triggers `main.py` at 9:00 AM Friday.
-2. **[GitHub]** Pipeline scrapes Play Store, calls OpenRouter/Groq, and saves the new Pulse data locally on the runner.
+2. **[GitHub]** Pipeline scrapes Play Store, calls OpenRouter, and saves the new Pulse data locally on the runner.
 3. **[GitHub]** Actions commits the new data (`outputs/`, `data/`) back to the `main` branch.
 4. **[Hugging Face]** Detects the commit, pulls the fresh data, and updates the live Flask UI.
 5. **[Human]** PM logs into the Hugging Face Space URL, reviews the fresh pulse, and clicks **[Send to Notes]**.
@@ -899,7 +833,7 @@ Every artifact produced by this pipeline is stripped of personally identifiable 
 
 | Secret | Storage | Access |
 |---|---|---|
-| `GROQ_API_KEY` | `.env` (gitignored) | `python-dotenv` → `os.getenv()` |
+| `OPENROUTER_API_KEY` | `.env` (gitignored) | `python-dotenv` → `os.getenv()` |
 | `OPENROUTER_API_KEY` | `.env` (gitignored) | `python-dotenv` → `os.getenv()` |
 | `SMTP_USER` / `SMTP_PASS` | `.env` (gitignored) | Only used for `.eml` composition |
 | `EMAIL_TO` | `.env` (gitignored) | Recipient address |
