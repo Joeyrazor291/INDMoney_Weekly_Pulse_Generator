@@ -140,5 +140,27 @@
         "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
       }
     ]
+  },
+  {
+    "timestamp": "2026-03-23T22:48:20.118430",
+    "total_reviews": 216,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "Brokerage Costs",
+        "summary": "High fees and lack of transparency frustrate users despite app's features.",
+        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing \u2014 seriously, it's hard to even find the right option. I couldn't figure out how to place stop loss or exit trades. Not beginner-friendly at all."
+      },
+      {
+        "theme": "Feature Gaps",
+        "summary": "Missing critical tools like SL limits and integrated charts hinder usability.",
+        "quote": "It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit."
+      },
+      {
+        "theme": "Usability Issues",
+        "summary": "Poor performance and confusing interfaces lead to frequent frustrations.",
+        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing..."
+      }
+    ]
   }
 ]
