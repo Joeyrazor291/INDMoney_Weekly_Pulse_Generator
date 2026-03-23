@@ -53,22 +53,16 @@ async def append_to_doc(document_id: str, content: str) -> str:
     service = get_docs_service()
     
     try:
-        # 1. Get document to find the end index
-        doc = service.documents().get(documentId=document_id).execute()
+        # We now use index 1 (beginning of document) to ensure 
+        # the user always sees the latest updates at the top!
+        target_index = 1
         
-        # The body length is the endIndex of the last element
-        # Note: Docs API indices are 0-based. The very last index is just before the terminal newline.
-        # body['content'][-1]['endIndex'] points to the very end.
-        end_index = doc.get('body').get('content')[-1].get('endIndex') - 1
-        if end_index < 1:
-            end_index = 1
-            
-        # 2. Prepare the batchUpdate request
+        # Prepare the batchUpdate request to prepend text
         requests = [
             {
                 'insertText': {
                     'location': {
-                        'index': end_index,
+                        'index': target_index,
                     },
                     'text': content
                 }
