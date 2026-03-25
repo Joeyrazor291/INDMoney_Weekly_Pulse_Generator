@@ -15,7 +15,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 HISTORY_FILE = PROJECT_ROOT / "data" / "analytics_history.json"
 
-def append_weekly_record(review_count: int, themes: list, avg_rating: float = 0.0):
+def append_weekly_record(review_count: int, themes: list, avg_rating: float = 0.0, timestamp_override: str = None):
     """
     Appends the current pipeline run metrics to the historical JSON array.
     """
@@ -36,18 +36,23 @@ def append_weekly_record(review_count: int, themes: list, avg_rating: float = 0.
             clean_themes.append({
                 "theme": getattr(t, "theme", ""),
                 "summary": getattr(t, "summary", ""),
-                "quote": getattr(t, "quote", "")
+                "count": getattr(t, "count", 1),
+                "quote": getattr(t, "quote", ""),
+                "tickets": getattr(t, "tickets", []) if hasattr(t, "tickets") else []
             })
         elif isinstance(t, dict):
             clean_themes.append({
                 "theme": t.get("theme", ""),
                 "summary": t.get("summary", ""),
-                "quote": t.get("quote", "")
+                "count": t.get("count", 1),
+                "quote": t.get("quote", ""),
+                "tickets": t.get("tickets", [])
             })
 
     # Create the timestamped record
+    timestamp = timestamp_override if timestamp_override else datetime.now().isoformat()
     record = {
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": timestamp,
         "total_reviews": review_count,
         "avg_rating": avg_rating,
         "themes": clean_themes
@@ -74,3 +79,36 @@ def get_analytics_history():
             return json.load(f)
     except Exception:
         return []
+
+def add_ticket_to_theme(timestamp: str, theme_name: str, ticket_description: str):
+    """
+    Finds a record by timestamp and a theme by name, then appends a ticket.
+    """
+    if not HISTORY_FILE.exists():
+        return False
+    
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            history = json.load(f)
+        
+        updated = False
+        for record in history:
+            if record.get("timestamp") == timestamp:
+                for theme in record.get("themes", []):
+                    if theme.get("theme") == theme_name:
+                        if "tickets" not in theme:
+                            theme["tickets"] = []
+                        theme["tickets"].append(ticket_description)
+                        updated = True
+                        break
+            if updated:
+                break
+        
+        if updated:
+            with open(HISTORY_FILE, "w") as f:
+                json.dump(history, f, indent=2)
+            return True
+    except Exception as e:
+        print(f"Error adding ticket: {e}")
+        
+    return False

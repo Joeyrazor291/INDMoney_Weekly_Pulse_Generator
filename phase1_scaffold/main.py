@@ -38,6 +38,7 @@ from phase5_builder.pulse_builder import build_pulse_note
 from phase6_approval.approval_ui import launch_approval_ui
 from phase6_approval.mcp_actions import append_to_notes, create_email_draft
 from phase8_analytics.history_manager import append_weekly_record
+from deduplicate_raw import deduplicate_raw_data
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -250,6 +251,12 @@ def run_pipeline():
         )
     except Exception as e:
         print(f"  ⚠️  Failed to append analytics record: {e}")
+
+    # ── Maintenance: Deduplicate Raw Data ───────────────────────────────
+    try:
+        deduplicate_raw_data(data_dir=config.data_raw_dir)
+    except Exception as e:
+        print(f"  ⚠️  Deduplication failed: {e}")
 
     # Skip UI launch if running in a GitHub Action Cron
     if os.environ.get("RUN_HEADLESS_PIPELINE_ONLY") == "true":

@@ -1,165 +1,87 @@
 [
   {
-    "timestamp": "2026-03-23T16:08:41.276648",
+    "timestamp": "2026-03-12T00:00:00",
+    "total_reviews": 219,
+    "avg_rating": 0.0,
+    "themes": [
+      {
+        "theme": "UI/UX Issues",
+        "summary": "The app's interface is generally user-friendly but requires optimization for tablets and smoother performance.",
+        "count": 10,
+        "quote": "The app runs well on both mobile and PC, and its interface is quite nice. However, it would be better if it were optimized for tablets. The spelling keeps getting bigger and smaller as soon as the floating window opens.",
+        "tickets": []
+      },
+      {
+        "theme": "Feature Requests",
+        "summary": "Users desire additional features like option charts, trailing stop loss, and improved performance.",
+        "count": 8,
+        "quote": "The app is very good but need mutual fund option also. Please add mutual fund option.",
+        "tickets": []
+      },
+      {
+        "theme": "Performance Issues",
+        "summary": "The app experiences slow loading, crashes, and instability affecting user experience.",
+        "count": 5,
+        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing...",
+        "tickets": []
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-22T00:00:00",
     "total_reviews": 215,
     "avg_rating": 0.0,
     "themes": [
       {
-        "theme": "Difficulty navigating portfolio view",
-        "summary": "Users have reported issues with the portfolio view, such as the sizing of elements and the inability to customize the layout.",
-        "quote": "Every day at 9:15 AM when I place an order, it shows 'Execute the order after market open' even though the market is already open and LTP is changing. This major glitch has been happening for over a month. Also, in Scalper Mode there is no option to view index and option charts together. Very frustrating experience."
+        "theme": "Performance Issues",
+        "summary": "Repeated crashes and slow performance disrupt user experience, causing frustration and loss of trust.",
+        "count": 15,
+        "quote": "app always hang today while trading it hang does not show any data and 1000 times I have tried to exit but app was totally fail and showing technical issue end I have lost my trade and I get loss after 1 hour the app get working and I exit with my 60% loss please don't trade in this app",
+        "tickets": [
+          "PB-6307"
+        ]
       },
       {
-        "theme": "Lack of advanced charting and trading features",
-        "summary": "Customers have requested more advanced charting capabilities, including the ability to view index and option charts together, as well as features like trailing stop-loss, partial exit, and quick exit options.",
-        "quote": "1) trading on chart is not available for any F&O Stocks in Flash trading app. also add trailing stop loss feature,partial exit,Quick exit feature on chart. 2) Please add index / stock chart & Option chart in same window (up & down) so we can check both chart in one page & trade easily.."
+        "theme": "Missing Features",
+        "summary": "Users request additional tools like option charts, mutual funds, and advanced indicators to enhance trading capabilities.",
+        "count": 10,
+        "quote": "The app is very good but need features like SL Limit orders & live chart position tools. Shared one feedback in IND money's reviews before\u2014hope you\u2019ll add them soon so I can use this as my main platform!",
+        "tickets": []
       },
       {
-        "theme": "Inconsistent and high brokerage charges",
-        "summary": "Some users have complained about the brokerage charges being higher than advertised, with charges of \u20b920 per order instead of the promised \u20b95 per order for F&O trading.",
-        "quote": "Brokerage is 20 not a 5 rs"
-      },
-      {
-        "theme": "Technical issues and app stability",
-        "summary": "Customers have reported various technical issues, such as the app crashing, orders not getting executed, and data lags, which have led to frustrating trading experiences and financial losses.",
-        "quote": "Every day at 9:15 AM when I place an order, it shows 'Execute the order after market open' even though the market is already open and LTP is changing. This major glitch has been happening for over a month. Also, in Scalper Mode there is no option to view index and option charts together. Very frustrating experience."
-      },
-      {
-        "theme": "Lack of key features and customization options",
-        "summary": "Users have requested the addition of features like mutual fund trading, US stock trading, and the ability to customize chart settings and indicators, which are currently missing from the app.",
-        "quote": "Chart is not available for FNO stocks in flash trading. Chart shall be implemented in flash trading. Stop loss and target price shall also required to be included in the app"
+        "theme": "User Support Issues",
+        "summary": "Inconsistent support responses and unresolved issues lead to dissatisfaction and churn.",
+        "count": 7,
+        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing...",
+        "tickets": []
       }
     ]
   },
   {
-    "timestamp": "2026-03-23T21:48:39.583927",
+    "timestamp": "2026-03-23T00:00:00",
     "total_reviews": 216,
     "avg_rating": 0.0,
     "themes": [
       {
-        "theme": "App Performance & Stability",
-        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
-        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
+        "theme": "Chart Issues",
+        "summary": "Multiple users reported chart malfunctions in flash mode and missing option charts, hindering trading accuracy.",
+        "count": 10,
+        "quote": "Chart is not available for FNO stocks in flash trading app. Stop loss and target price shall also required to be included in the app.",
+        "tickets": []
       },
       {
-        "theme": "User Interface Refinement",
-        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
-        "quote": "Love the features but the text is a bit too small on the main screen."
+        "theme": "Performance Problems",
+        "summary": "Several reviews highlighted slow performance, crashes, and unresponsive support, impacting user experience.",
+        "count": 15,
+        "quote": "chart crashing and getting off in my device moto g73 please fix.",
+        "tickets": []
       },
       {
-        "theme": "Transparency in Fee Structure",
-        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
-        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-03-23T21:49:25.344292",
-    "total_reviews": 216,
-    "avg_rating": 0.0,
-    "themes": [
-      {
-        "theme": "App Performance & Stability",
-        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
-        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
-      },
-      {
-        "theme": "User Interface Refinement",
-        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
-        "quote": "Love the features but the text is a bit too small on the main screen."
-      },
-      {
-        "theme": "Transparency in Fee Structure",
-        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
-        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-03-23T21:50:14.193889",
-    "total_reviews": 216,
-    "avg_rating": 0.0,
-    "themes": [
-      {
-        "theme": "App Performance & Stability",
-        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
-        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
-      },
-      {
-        "theme": "User Interface Refinement",
-        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
-        "quote": "Love the features but the text is a bit too small on the main screen."
-      },
-      {
-        "theme": "Transparency in Fee Structure",
-        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
-        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-03-23T22:15:43.487155",
-    "total_reviews": 216,
-    "avg_rating": 0.0,
-    "themes": [
-      {
-        "theme": "High Brokerage Fees",
-        "summary": "App charges excessive fees, leading to dissatisfaction despite good features.",
-        "quote": ""
-      },
-      {
-        "theme": "Missing Key Features",
-        "summary": "Critical features like SL limits and option charts are absent, hindering usability.",
-        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing..."
-      },
-      {
-        "theme": "Technical Glitches",
-        "summary": "Frequent crashes and performance issues disrupt trading experiences.",
-        "quote": "Frequent crashes and performance issues disrupt trading experiences."
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-03-23T22:19:55.213939",
-    "total_reviews": 216,
-    "avg_rating": 0.0,
-    "themes": [
-      {
-        "theme": "App Performance & Stability",
-        "summary": "Users are reporting occasional crashes during the KYC process and slow loading times on the dashboard.",
-        "quote": "The app keeps closing when I try to upload my PAN card. Very frustrating."
-      },
-      {
-        "theme": "User Interface Refinement",
-        "summary": "Feedback suggests the new portfolio view is slightly cluttered, with requested improvements for font clarity.",
-        "quote": "Love the features but the text is a bit too small on the main screen."
-      },
-      {
-        "theme": "Transparency in Fee Structure",
-        "summary": "A subset of users is seeking clearer breakdowns for US Stock withdrawal charges and conversion rates.",
-        "quote": "I wasn't aware of the hidden 5$ withdrawal fee. Please make it more visible."
-      }
-    ]
-  },
-  {
-    "timestamp": "2026-03-23T22:48:20.118430",
-    "total_reviews": 216,
-    "avg_rating": 0.0,
-    "themes": [
-      {
-        "theme": "Brokerage Costs",
-        "summary": "High fees and lack of transparency frustrate users despite app's features.",
-        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing \u2014 seriously, it's hard to even find the right option. I couldn't figure out how to place stop loss or exit trades. Not beginner-friendly at all."
-      },
-      {
-        "theme": "Feature Gaps",
-        "summary": "Missing critical tools like SL limits and integrated charts hinder usability.",
-        "quote": "It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit."
-      },
-      {
-        "theme": "Usability Issues",
-        "summary": "Poor performance and confusing interfaces lead to frequent frustrations.",
-        "quote": "I lost \u20b943,000 using INDStock for options trading. It doesn\u2019t support stop loss trigger like Groww, so trades don\u2019t auto-exit. The options layout is extremely confusing..."
+        "theme": "Missing Features",
+        "summary": "Many users requested additional features like mutual funds integration and improved UI elements for better usability.",
+        "count": 5,
+        "quote": "Many users requested additional features like mutual funds integration and improved UI elements for better usability.",
+        "tickets": []
       }
     ]
   }

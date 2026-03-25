@@ -7,7 +7,7 @@
     <title>INDMoney Pulse — Analytics Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -19,18 +19,29 @@
             --text-secondary: #4B5563;
             --text-muted: #9CA3AF;
             --accent: #10B981;
+            --accent-hover: #059669;
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Category Colors */
+            --cat-perf: #ef4444; /* Red */
+            --cat-feat: #f59e0b; /* Yellow/Orange */
+            --cat-price: #10b981; /* Teal/Green */
+            --cat-uiux: #3b82f6; /* Blue */
+            --cat-other: #6366f1; /* Indigo */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #F9FAFB !important;
+            background-color: var(--bg) !important;
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
         }
 
+        /* ── Header ─────────────────────────────────────────── */
         .header {
             background: #002B36; color: white; padding: 1rem 2rem;
             display: flex; align-items: center; justify-content: space-between;
@@ -44,36 +55,115 @@
         .nav-links a { color: #9CA3AF; text-decoration: none; transition: var(--transition); }
         .nav-links a:hover, .nav-links a.active { color: white; }
         
+        /* ── Main Layout ────────────────────────────────────── */
         .container {
             max-width: 1280px; margin: 0 auto; padding: 2rem;
-            display: grid; grid-template-columns: 1fr; gap: 2rem; /* Full width for Analytics */
         }
-        .page-header { margin-bottom: 0.5rem; }
+        .page-header { margin-bottom: 2rem; }
         .breadcrumbs { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 0.75rem; }
         .page-title { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #111827; }
-        .page-subtitle { color: var(--text-secondary); margin-top: 0.5rem; }
-        
-        .card {
-            background: var(--surface); border-radius: 1.5rem; border: 1px solid var(--border);
+        .page-subtitle { color: var(--text-secondary); margin-top: 0.25rem; }
+
+        /* ── Stats Row ──────────────────────────────────────── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface); border-radius: 1rem; border: 1px solid var(--border);
+            padding: 1.5rem; position: relative; box-shadow: var(--shadow-sm);
+        }
+        .stat-label { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); }
+        .stat-subtext { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+        .stat-icon { color: var(--text-muted); opacity: 0.5; }
+
+        /* ── Toggle Controls ────────────────────────────────── */
+        .controls-row {
+            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;
+        }
+        .toggle-btn {
+            background: var(--surface-secondary); border: 1px solid var(--border);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600;
+            color: var(--text-secondary); cursor: pointer; transition: var(--transition);
+        }
+        .toggle-btn.active { background: white; color: var(--text-primary); border-color: var(--text-primary); box-shadow: var(--shadow-sm); }
+
+        /* ── Chart Section ──────────────────────────────────── */
+        .chart-card {
+            background: var(--surface); border-radius: 1rem; border: 1px solid var(--border);
             padding: 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);
         }
-        .card-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .chart-title { font-size: 1.125rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .chart-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .chart-container { height: 400px; position: relative; }
 
-        .dashboard-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+        /* ── Table Section ──────────────────────────────────── */
+        .table-card {
+            background: var(--surface); border-radius: 1rem; border: 1px solid var(--border);
+            padding: 0; box-shadow: var(--shadow-sm); overflow: hidden;
+        }
+        .table-header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
+        .table-title { font-size: 1.125rem; font-weight: 700; }
+        .table-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        
+        .analytics-table { width: 100%; border-collapse: collapse; }
+        .analytics-table th {
+            background: #F9FAFB; text-align: left; padding: 1rem 1.5rem;
+            font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border);
+        }
+        .analytics-table td {
+            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; vertical-align: middle;
+        }
+        .analytics-table tr:last-child td { border-bottom: none; }
+        .analytics-table tr:hover { background: #fbfbfc; }
+
+        .theme-name { font-weight: 700; color: var(--text-primary); display: block; }
+        .theme-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.4; margin-top: 0.25rem; }
+        
+        .priority-badge {
+            display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+            border-radius: 9999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+        }
+        .priority-high { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .priority-medium { background: rgba(0, 0, 0, 0.05); color: #111827; }
+        .priority-low { background: rgba(243, 244, 246, 1); color: #9CA3AF; }
+
+        .count-badge {
+            background: #F3F4F6; color: var(--text-primary);
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem;
         }
 
-        /* Tables for latest recurring themes */
-        .theme-table { width: 100%; border-collapse: collapse; }
-        .theme-table th, .theme-table td {
-            text-align: left; padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.875rem;
+        .ticket-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .ticket-pill {
+            background: white; border: 1px solid var(--border);
+            padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.75rem;
+            font-weight: 600; display: flex; align-items: center; gap: 0.25rem;
         }
-        .theme-table th { color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-        .theme-table tr:hover { background: #f9fafb; }
-        .badge {
-            background: rgba(59, 130, 246, 0.1); color: #3b82f6;
-            padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600; font-size: 0.7rem;
+        .ticket-pill::after { content: "×"; opacity: 0.5; font-size: 1rem; cursor: pointer; }
+
+        .add-ticket-box {
+            display: flex; gap: 0.5rem; margin-top: 0.5rem;
         }
+        .ticket-input {
+            flex: 1; padding: 0.5rem 0.75rem; border-radius: 0.5rem;
+            border: 1px solid var(--border); font-size: 0.8125rem;
+            background: #F9FAFB; transition: var(--transition);
+        }
+        .ticket-input:focus { border-color: var(--accent); background: white; outline: none; }
+        .btn-add {
+            background: #64748b; color: white; border: none;
+            width: 32px; height: 32px; border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: var(--transition);
+        }
+        .btn-add:hover { background: #475569; }
+
+        /* ── Transitions ────────────────────────────────────── */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 
@@ -90,116 +180,324 @@
         </nav>
     </header>
 
-    <main class="container">
+    <main class="container fade-in">
         <div class="page-header">
             <div class="breadcrumbs">
                 <span>Admin Tools</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                <span style="font-weight: 600; color: var(--text-primary);">Theme & Sentiment Analytics</span>
+                <span style="font-weight: 600; color: var(--text-primary);">PM Analytics Dashboard</span>
             </div>
-            <h1 class="page-title">Longitudinal Pulse Metrics</h1>
-            <p class="page-subtitle">Track App Review volume spikes and repeating issue patterns over time.</p>
+            <h1 class="page-title">Analytics Issue Tracker</h1>
+            <p class="page-subtitle">Monitor and track analytics implementation issues and theme longitudinal patterns.</p>
         </div>
 
-        <div class="dashboard-grid">
-            <!-- Review Volume Chart -->
-            <div class="card">
-                <h3 class="card-title">Weekly Review Ingestion Volume</h3>
-                <canvas id="volumeChart" height="250"></canvas>
+        <!-- 1. Stats Row -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">
+                    Total Issues
+                    <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </div>
+                <div class="stat-value" id="stat-total-issues">0</div>
+                <div class="stat-subtext">Across all categories</div>
             </div>
-            
-            <!-- Recurring Issues Table -->
-            <div class="card">
-                <h3 class="card-title">Recent Critical Themes</h3>
-                <table class="theme-table" id="themeTable">
-                    <thead>
-                        <tr>
-                            <th>Identified Date</th>
-                            <th>Theme</th>
-                            <th>Status / Tag</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Injected via JS -->
-                    </tbody>
-                </table>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Active Tickets
+                    <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                </div>
+                <div class="stat-value" id="stat-active-tickets">0</div>
+                <div class="stat-subtext">Currently tracked</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    Categories
+                    <svg class="stat-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </div>
+                <div class="stat-value" id="stat-categories">0</div>
+                <div class="stat-subtext">Being monitored</div>
+            </div>
+        </div>
+
+        <!-- 2. Chart Section -->
+        <div class="controls-row">
+            <button class="toggle-btn active" onclick="setChartType('bar')">Bar Chart</button>
+            <button class="toggle-btn" onclick="setChartType('line')">Trend Line</button>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title" id="chart-main-title">Week-wise Issues by Category</h3>
+            <p class="chart-subtitle" id="chart-main-subtitle">Number of issues reported per category each week</p>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 3. Table Section -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3 class="table-title">Category Tracking & Ticket Management</h3>
+                <p class="table-subtitle">Track identified analytics issues and their associated tickets</p>
+            </div>
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th style="width: 250px;">Category</th>
+                        <th style="width: 100px;">Volume</th>
+                        <th>Description</th>
+                        <th style="width: 100px;">Priority</th>
+                        <th style="width: 250px;">Tickets</th>
+                        <th style="width: 250px;">Add Ticket</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <!-- Injected via JS -->
+                </tbody>
+            </table>
         </div>
     </main>
 
-    <!-- Inject historical JSON data safely -->
-    <script type="application/json" id="historyData">
-        {{ history_data | tojson | safe }}
-    </script>
+    <!-- Data Injection -->
+    <script type="application/json" id="historyData">{{ history_data | tojson | safe }}</script>
 
     <script>
+        // Use the same mapping logic as the Python backend
+        function getThemeMetadata(themeName) {
+            const nameLow = (themeName || "").toLowerCase();
+            if (nameLow.match(/perform|speed|slow|crash|bug|error/)) {
+                return { label: "Performance", color: "#ef4444", priority: "high", icon: "warning" };
+            } else if (nameLow.match(/feature|missing|request|add|option/)) {
+                return { label: "Features", color: "#f59e0b", priority: "medium", icon: "features" };
+            } else if (nameLow.match(/fee|charge|cost|price|brokerage|transparent/)) {
+                return { label: "Pricing", color: "#10b981", priority: "high", icon: "pricing" };
+            } else if (nameLow.match(/ui|layout|ux|design|interface/)) {
+                return { label: "UI/UX", color: "#3b82f6", priority: "low", icon: "uiux" };
+            }
+            return { label: "General", color: "#6366f1", priority: "low", icon: "other" };
+        }
+
+        let mainChart = null;
+        let chartType = 'bar';
+        let history = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             const rawData = document.getElementById("historyData").textContent;
-            let history = [];
             try {
                 history = JSON.parse(rawData);
-            } catch (e) {
-                console.error("Failed to parse history data", e);
+            } catch (e) { console.error("History parse fail", e); }
+
+            updateStats();
+            renderTable();
+            renderChart();
+        });
+
+        function updateStats() {
+            let totalIssues = 0;
+            let activeTickets = 0;
+            const uniqueCategories = new Set();
+
+            history.forEach(record => {
+                (record.themes || []).forEach(t => {
+                    totalIssues += (t.count || 1);
+                    activeTickets += (t.tickets || []).length;
+                    uniqueCategories.add(getThemeMetadata(t.theme).label);
+                });
+            });
+
+            document.getElementById('stat-total-issues').textContent = totalIssues;
+            document.getElementById('stat-active-tickets').textContent = activeTickets;
+            document.getElementById('stat-categories').textContent = uniqueCategories.size;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 3rem; color: #9ca3af;">No historical data found. Run the pipeline to populate.</td></tr>';
+                return;
             }
 
-            // Extract labels (Dates) and data (Review Count)
-            const labels = history.map(row => {
-                const d = new Date(row.timestamp);
+            // Flatten themes from all history, taking latest summary/tickets for unique themes
+            const themeMap = new Map();
+            history.forEach(record => {
+                (record.themes || []).forEach(t => {
+                    const meta = getThemeMetadata(t.theme);
+                    const key = t.theme;
+                    if (!themeMap.has(key)) {
+                        themeMap.set(key, { ...t, meta, count: (t.count || 1), timestamp: record.timestamp, tickets: t.tickets || [] });
+                    } else {
+                        const existing = themeMap.get(key);
+                        existing.count += (t.count || 1);
+                        existing.tickets = [...new Set([...existing.tickets, ...(t.tickets || [])])];
+                        // Keep latest timestamp/summary
+                        if (new Date(record.timestamp) > new Date(existing.timestamp)) {
+                            existing.summary = t.summary;
+                            existing.timestamp = record.timestamp;
+                        }
+                    }
+                });
+            });
+
+            // Convert map to array and sort by priority/count
+            const sortedThemes = Array.from(themeMap.values()).sort((a, b) => b.count - a.count);
+
+            sortedThemes.forEach(t => {
+                const tr = document.createElement('tr');
+                
+                const ticketPills = (t.tickets || []).map(tick => `<div class="ticket-pill">${tick}</div>`).join('');
+                const priorityClass = `priority-${t.meta.priority}`;
+
+                tr.innerHTML = `
+                    <td>
+                        <span class="theme-name">${t.theme}</span>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">${t.meta.label}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge ${getThemeMetadata(t.theme).class}" style="font-size: 1.1em; padding: 6px 12px;">
+                            ${t.count || 1}
+                        </span>
+                    </td>
+                    <td><div class="theme-desc">${t.summary}</div></td>
+                    <td><span class="priority-badge ${priorityClass}">${t.meta.priority}</span></td>
+                    <td><div class="ticket-list">${ticketPills || '<span style="color:var(--text-muted); font-size:0.8rem">No tickets</span>'}</div></td>
+                    <td>
+                        <form action="/analytics/add_ticket" method="POST" class="add-ticket-box">
+                            <input type="hidden" name="timestamp" value="${t.timestamp}">
+                            <input type="hidden" name="theme_name" value="${t.theme}">
+                            <input type="text" name="ticket_description" class="ticket-input" placeholder="e.g., ANAL-104" required>
+                            <button type="submit" class="btn-add">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                        </form>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setChartType(type) {
+            chartType = type;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (type === 'bar') {
+                document.getElementById('chart-main-title').textContent = 'Week-wise Issues by Category';
+                document.getElementById('chart-main-subtitle').textContent = 'Number of issues reported per category each week';
+            } else {
+                document.getElementById('chart-main-title').textContent = 'Category Issue Trend';
+                document.getElementById('chart-main-subtitle').textContent = 'Number of issues per category over time';
+            }
+            
+            renderChart();
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (mainChart) mainChart.destroy();
+
+            const labels = history.map(h => {
+                const d = new Date(h.timestamp);
                 return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
             });
-            const volumes = history.map(row => row.total_reviews);
 
-            // 1. Render Volume Chart
-            const ctx = document.getElementById('volumeChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels.length ? labels : ['No Data Yet'],
-                    datasets: [{
-                        label: 'Play Store Reviews Processed',
-                        data: volumes.length ? volumes : [0],
-                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                        borderRadius: 6,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
-                        x: { grid: { display: false } }
-                    }
-                }
+            // Identify only categories that have at least one issue in the entire history
+            const allCategories = ["Performance", "Features", "Pricing", "UI/UX", "General"];
+            const activeCategories = allCategories.filter(cat => {
+                return history.some(h => (h.themes || []).some(t => getThemeMetadata(t.theme).label === cat));
             });
 
-            // 2. Render Themes Table (Latest 6 themes)
-            const tableBody = document.querySelector("#themeTable tbody");
-            if (history.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#9ca3af;">No historical theme data available yet.</td></tr>`;
-            } else {
-                // Flatten all themes from recent to oldest
-                const allThemes = [];
-                history.slice().reverse().forEach(record => {
-                    const dateStr = new Date(record.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                    (record.themes || []).forEach(t => {
-                        allThemes.push({ date: dateStr, theme: t.theme });
-                    });
+            if (chartType === 'bar') {
+                const datasets = activeCategories.map(cat => {
+                    const meta = getThemeMetadata(cat);
+                    return {
+                        label: cat,
+                        data: history.map(h => {
+                            return (h.themes || [])
+                                .filter(t => getThemeMetadata(t.theme).label === cat)
+                                .reduce((sum, t) => sum + (t.count || 1), 0);
+                        }),
+                        backgroundColor: meta.color,
+                        borderRadius: 4,
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.6
+                    };
                 });
 
-                // Take top 6
-                const recentThemes = allThemes.slice(0, 6);
-                recentThemes.forEach(t => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${t.date}</td>
-                        <td style="font-weight: 500;">${t.theme}</td>
-                        <td><span class="badge">Tracked</span></td>
-                    `;
-                    tableBody.appendChild(tr);
+                mainChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, padding: 20, font: { weight: '600', size: 12 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: (context) => {
+                                        const weekIdx = context.dataIndex;
+                                        const cat = context.dataset.label;
+                                        const record = history[weekIdx];
+                                        const matchingThemes = (record.themes || []).filter(t => getThemeMetadata(t.theme).label === cat);
+                                        if (matchingThemes.length > 0) {
+                                            return matchingThemes.map(t => ` • ${t.theme}`).join('\n');
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { borderDash: [4, 4], drawBorder: false } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            } else {
+                // Trend line chart
+                const datasets = activeCategories.map(cat => {
+                    const meta = getThemeMetadata(cat);
+                    return {
+                        label: cat,
+                        data: history.map(h => {
+                            const catsInWeek = (h.themes || []).filter(t => getThemeMetadata(t.theme).label === cat);
+                            if (catsInWeek.length === 0) return 0;
+                            return catsInWeek.reduce((sum, t) => sum + (t.count || 1), 0);
+                        }),
+                        borderColor: meta.color,
+                        backgroundColor: meta.color + '20',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    };
+                });
+
+                mainChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, boxWidth: 6, boxHeight: 6, padding: 20, font: { weight: '600', size: 12 } }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { borderDash: [4, 4], drawBorder: false } },
+                            x: { grid: { display: false } }
+                        }
+                    }
                 });
             }
-        });
+        }
     </script>
 </body>
+
 </html>

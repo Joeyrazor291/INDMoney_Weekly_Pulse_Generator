@@ -24,7 +24,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from phase4_theme_engine.fee_explainer import generate_fee_explanation
 from phase6_approval.mcp_actions import append_to_notes, create_email_draft
-from phase8_analytics.history_manager import get_analytics_history
+from phase8_analytics.history_manager import get_analytics_history, add_ticket_to_theme
 import traceback
 
 # For production debugging
@@ -185,6 +185,21 @@ def analytics():
         history_data=history_data,
         now=datetime.now().strftime("%Y-%m-%d %H:%M")
     )
+
+
+@app.route("/analytics/add_ticket", methods=["POST"])
+def add_ticket():
+    """Add a ticket description to a specific theme in history."""
+    timestamp = request.form.get("timestamp")
+    theme_name = request.form.get("theme_name")
+    ticket_desc = request.form.get("ticket_description", "").strip()
+    
+    if timestamp and theme_name and ticket_desc:
+        success = add_ticket_to_theme(timestamp, theme_name, ticket_desc)
+        if not success:
+            logger.error(f"Failed to add ticket to {theme_name} at {timestamp}")
+            
+    return redirect(url_for("analytics"))
 
 
 @app.route("/generate_fee", methods=["POST"])

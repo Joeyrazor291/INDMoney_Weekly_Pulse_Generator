@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 class Theme:
     theme: str
     summary: str
+    count: int = 1  # Approximate number of reviews associated with this theme
     quote: str | None = None  # Will be populated in Stage 2
 
 @dataclass
@@ -39,13 +40,14 @@ Focus on user pain points, feature requests, or areas of delight.
 Rules:
 1. Return exactly 3 to 5 themes.
 2. For each theme, provide a concise summary (1-2 sentences).
-3. Be specific. Instead of "UI issues", say "Difficulty navigating portfolio view".
-4. Respond in strict JSON format.
+3. For each theme, provide a "count" which is your best estimate of how many reviews in this batch directly relate to this theme.
+4. Be specific. Instead of "UI issues", say "Difficulty navigating portfolio view".
+5. Respond in strict JSON format.
 
 Output Format:
 {
   "themes": [
-    {"theme": "Theme Title", "summary": "Summary description"}
+    {"theme": "Theme Title", "summary": "Summary description", "count": 25}
   ]
 }
 """
@@ -112,7 +114,14 @@ def analyze_reviews(router, reviews: List[Dict]) -> ThemeResult:
         logger.error(f"Failed to parse themes JSON: {theme_resp}")
         themes_data = []
 
-    themes = [Theme(theme=t["theme"], summary=t["summary"], quote=None) for t in themes_data]
+    themes = [
+        Theme(
+            theme=t["theme"], 
+            summary=t["summary"], 
+            count=int(t.get("count", 1)),
+            quote=None
+        ) for t in themes_data
+    ]
 
     # --- Step 2: Extract Quotes (via MCP Router with Fallback) ---
     for theme in themes:

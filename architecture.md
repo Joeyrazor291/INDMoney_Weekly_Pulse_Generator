@@ -724,34 +724,34 @@ pytest tests/test_pulse_builder.py -v  # Phase 5
 
 Provide an "Analytics Tab" in the web UI (Approval UI) to track longitudinal sentiment trends and theme life cycles. This answers whether fixes are working and whether new issues are emerging over time.
 
-### Architecture Design for Analytics Storage & Retrieval
+### UI Design (Reference: Analytics.png)
 
-To support analytics without over-engineering a heavy database, we will capture key metrics at the end of every successful pipeline run (e.g., when a Pulse is approved) and store them in a persistent datastore (e.g., a local SQLite database or Google Sheets via MCP).
+The Analytics UI is designed to provide high-level metrics and detailed theme tracking in a single, cohesive dashboard.
 
-#### Component: Analytics Datastore
-When Phase 6 actions are approved, the following fields will be appended to an `analytics_history` table/sheet:
-- `week_date`: The generation date of the pulse.
-- `total_reviews`: Number of processed reviews.
-- `avg_rating`: Average rating of the ingested batch.
-- `theme_1`, `theme_2`, `theme_3`: The string titles of the top themes generated.
+#### 1. Top Stats Cards
+Three primary metrics are displayed at the top of the dashboard:
+- **Total Reviews Analyzed**: Aggregate count of processed reviews from all historical records.
+- **Active Critical Themes**: Count of distinct themes identified in the most recent pipeline runs.
+- **Sentiment Velocity**: A rolling average of ratings to track overall app health.
 
-### Point 1. Theme & Issue Lifecycle Analytics (Feature Focus)
-The Analytics Tab will query the historical datastore to visualize:
-- **Theme Recurrence Rate:** A tracker showing how many consecutive weeks a theme (using exact or high-similarity match) appears in the Top 3.
-- **Time-to-Resolution (TTR):** A calculated metric for the latency between a theme first appearing and falling off the top themes list.
-- **New vs. Recurring Themes:** A clear delineation identifying if the week's themes are regressions/persistent or entirely new problems.
-- **Theme Dominance:** Charts showing the breakdown of review volumes claimed by the Top 3 themes.
+#### 2. Longitudinal Trend Charts
+A toggleable chart interface allowing PMs to switch between:
+- **Bar Chart (Volume)**: Week-over-week distribution of review volumes categorized by theme impact. On hovering over each bar, it should show the theme names and the number of reviews for each theme sorted in descending order.
+- **Trend Line (Sentiment)**: Linear progression of average ratings to visualize sentiment shifts.
 
-### Point 2. User Sentiment & Review Volume Analytics (App Health)
-The UI will display high-level trend graphs mapping:
-- **Weekly Sentiment Velocity:** A line chart of the `avg_rating` of ingested reviews over the past N weeks.
-- **Volume Spikes:** A component showing total reviews processed per week, allowing PMs to correlate volume spikes with sentiment drops.
-- **5-Star vs 1-Star Ratio:** A stacked bar/trend comparison of extreme positive vs extreme negative reviews week over week.
+#### 3. Theme Lifecycle & Action Tracker
+A detailed table replacing the basic themes list, with the following columns:
+- **Category (Theme)**: The primary themes identified by the LLM.
+- **Description**: A concise summary of the issue or feedback.
+- **Priority**: A color-coded badge (High/Medium/Low) based on frequency and rating impact.
+- **Reviews (Issues)**: Number of users reporting this theme in the latest batch.
+- **Linked Tickets**: The number of tickets already linked to this issue category for enhancement.
+- **Add Ticket**: To add a new ticket for enhancing this category. This should be a free text field where the user can enter the ticket description. .
 
 ### Web UI Integration (`phase6_approval/approval_ui.py`)
-- The existing Flask application will be expanded with a new route (`/analytics`).
-- Rendered via a new template: `phase6_approval/templates/analytics.html`.
-- Uses lightweight JS charting libraries (e.g., Chart.js) to consume the analytics datastore output.
+- **Route**: `/analytics` renders the longitudinal dashboard.
+- **Template**: `phase6_approval/templates/analytics.html` uses Chart.js for visualization and ensures theme parity with the Approval UI.
+- **Data Source**: `data/analytics_history.json` managed by `history_manager.py`.
 
 ---
 
